@@ -3,7 +3,6 @@ package com.github.twitch4j.codegen.java.feign.config;
 import com.github.twitch4j.codegen.core.api.INitroCodegenConfig;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.experimental.Accessors;
 
 import java.util.Map;
 
