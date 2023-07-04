@@ -1,8 +1,8 @@
 package com.github.twitch4j.codegen.engine.pebble.operator;
 
-import com.mitchellbosecke.pebble.node.expression.BinaryExpression;
-import com.mitchellbosecke.pebble.template.EvaluationContextImpl;
-import com.mitchellbosecke.pebble.template.PebbleTemplateImpl;
+import io.pebbletemplates.pebble.node.expression.BinaryExpression;
+import io.pebbletemplates.pebble.template.EvaluationContextImpl;
+import io.pebbletemplates.pebble.template.PebbleTemplateImpl;
 
 public class StartsWithExpression extends BinaryExpression<Object> {
 

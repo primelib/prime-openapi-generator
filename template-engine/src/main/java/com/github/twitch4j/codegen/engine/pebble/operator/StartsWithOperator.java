@@ -1,11 +1,15 @@
 package com.github.twitch4j.codegen.engine.pebble.operator;
 
-import com.mitchellbosecke.pebble.node.expression.BinaryExpression;
-import com.mitchellbosecke.pebble.operator.Associativity;
-import com.mitchellbosecke.pebble.operator.BinaryOperator;
-import com.mitchellbosecke.pebble.operator.BinaryOperatorType;
+import io.pebbletemplates.pebble.node.expression.BinaryExpression;
+import io.pebbletemplates.pebble.operator.Associativity;
+import io.pebbletemplates.pebble.operator.BinaryOperator;
+import io.pebbletemplates.pebble.operator.BinaryOperatorType;
 
 public class StartsWithOperator implements BinaryOperator {
+
+    public BinaryExpression<?> createInstance() {
+        return new StartsWithExpression();
+    }
 
     /**
      * This precedence is set based on

@@ -1,8 +1,0 @@
-// In this section you declare the dependencies for your production and test code
-dependencies {
-    // OpenAPI Generator
-    api group: 'org.openapitools', name: 'openapi-generator', version: "${property('openapitools.version')}"
-
-    // Template Engines
-    api group: 'io.pebbletemplates', name: 'pebble', version: '3.1.5'
-}

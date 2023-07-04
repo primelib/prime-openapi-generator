@@ -1,8 +1,8 @@
 package com.github.twitch4j.codegen.engine.pebble.filter;
 
-import com.mitchellbosecke.pebble.extension.Filter;
-import com.mitchellbosecke.pebble.template.EvaluationContext;
-import com.mitchellbosecke.pebble.template.PebbleTemplate;
+import io.pebbletemplates.pebble.extension.Filter;
+import io.pebbletemplates.pebble.template.EvaluationContext;
+import io.pebbletemplates.pebble.template.PebbleTemplate;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;

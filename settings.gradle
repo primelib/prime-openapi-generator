@@ -1,6 +1,0 @@
-include 'template-engine', 'core', 'java-feign', 'cli', 'usage-example'
-
-rootProject.name = 'openapi-generator'
-rootProject.children.each {
-    it.name = rootProject.name + "-" + it.name
-}

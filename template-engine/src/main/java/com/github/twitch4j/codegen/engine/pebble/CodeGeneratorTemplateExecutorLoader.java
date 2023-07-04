@@ -1,6 +1,6 @@
 package com.github.twitch4j.codegen.engine.pebble;
 
-import com.mitchellbosecke.pebble.loader.ClasspathLoader;
+import io.pebbletemplates.pebble.loader.ClasspathLoader;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.openapitools.codegen.api.TemplatingExecutor;

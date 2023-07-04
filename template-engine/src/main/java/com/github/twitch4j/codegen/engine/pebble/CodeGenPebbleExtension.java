@@ -6,15 +6,15 @@ import com.github.twitch4j.codegen.engine.pebble.filter.WrapInFilter;
 import com.github.twitch4j.codegen.engine.pebble.function.GetOrDefaultFunction;
 import com.github.twitch4j.codegen.engine.pebble.function.NewLineFunction;
 import com.github.twitch4j.codegen.engine.pebble.operator.StartsWithOperator;
-import com.mitchellbosecke.pebble.attributes.AttributeResolver;
-import com.mitchellbosecke.pebble.extension.Extension;
-import com.mitchellbosecke.pebble.extension.Filter;
-import com.mitchellbosecke.pebble.extension.Function;
-import com.mitchellbosecke.pebble.extension.NodeVisitorFactory;
-import com.mitchellbosecke.pebble.extension.Test;
-import com.mitchellbosecke.pebble.operator.BinaryOperator;
-import com.mitchellbosecke.pebble.operator.UnaryOperator;
-import com.mitchellbosecke.pebble.tokenParser.TokenParser;
+import io.pebbletemplates.pebble.attributes.AttributeResolver;
+import io.pebbletemplates.pebble.extension.Extension;
+import io.pebbletemplates.pebble.extension.Filter;
+import io.pebbletemplates.pebble.extension.Function;
+import io.pebbletemplates.pebble.extension.NodeVisitorFactory;
+import io.pebbletemplates.pebble.extension.Test;
+import io.pebbletemplates.pebble.operator.BinaryOperator;
+import io.pebbletemplates.pebble.operator.UnaryOperator;
+import io.pebbletemplates.pebble.tokenParser.TokenParser;
 
 import java.util.Arrays;
 import java.util.List;
@@ -51,7 +51,7 @@ public class CodeGenPebbleExtension implements Extension {
 
     @Override
     public List<BinaryOperator> getBinaryOperators() {
-        return Arrays.asList(new StartsWithOperator());
+        return List.of(new StartsWithOperator());
     }
 
     @Override
