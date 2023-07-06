@@ -1,5 +1,5 @@
 {# @pebvariable name="imports" type="java.util.List<com.github.twitch4j.codegen.core.domain.template.NitroGeneratorImport>" #}
-{# @pebvariable name="cfg" type="com.github.twitch4j.codegen.java.feign.config.JavaFeignGeneratorConfig" #}
+{# @pebvariable name="cfg" type="io.github.primelib.primecodegen.javafeign.config.JavaFeignGeneratorConfig" #}
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

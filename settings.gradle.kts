@@ -1,4 +1,4 @@
-rootProject.name = "openapi-generator"
+rootProject.name = "primecodegen"
 
 include(
     "template-engine",

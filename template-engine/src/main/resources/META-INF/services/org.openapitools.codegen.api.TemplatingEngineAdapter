@@ -1,2 +1,2 @@
-com.github.twitch4j.codegen.engine.AutoEngineAdapter
-com.github.twitch4j.codegen.engine.PebbleEngineAdapter
+io.github.primelib.primecodegen.templateengine.AutoEngineAdapter
+io.github.primelib.primecodegen.templateengine.PebbleEngineAdapter

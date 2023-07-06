@@ -1,7 +1,19 @@
+plugins {
+    `java-library`
+    id("me.philippheuer.configuration")
+}
+
+projectConfiguration {
+    artifactGroupId.set("io.github.primelib.codegen")
+    artifactId.set("template-engine")
+    artifactDisplayName.set("template-engine")
+    artifactDescription.set("Template Engines for the OpenAPI Generator")
+}
+
 dependencies {
-    // OpenAPI Generator
+    // openapi generator
     api("org.openapitools:openapi-generator")
 
-    // Template Engines
+    // template engine
     api("io.pebbletemplates:pebble:3.2.1")
 }
