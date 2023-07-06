@@ -16,7 +16,6 @@ import io.pebbletemplates.pebble.operator.BinaryOperator;
 import io.pebbletemplates.pebble.operator.UnaryOperator;
 import io.pebbletemplates.pebble.tokenParser.TokenParser;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 

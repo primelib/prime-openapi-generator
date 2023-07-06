@@ -6,7 +6,7 @@ plugins {
 }
 
 dependencies {
-    implementation("org.openapitools:openapi-generator-cli:6.0.1")
+    implementation("org.openapitools:openapi-generator-cli")
 
     implementation(project(":core"))
     implementation(project(":template-engine"))
@@ -15,7 +15,9 @@ dependencies {
     implementation("org.jetbrains:annotations:16.0.2")
 }
 
-val mainClassName = "com.github.twitch4j.codegen.cli.Application"
+application {
+    mainClass.set("com.github.twitch4j.codegen.cli.Application")
+}
 
 tasks {
     withType<Jar> {

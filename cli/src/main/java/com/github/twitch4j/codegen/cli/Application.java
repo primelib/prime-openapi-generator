@@ -6,7 +6,17 @@ import io.airlift.airline.ParseArgumentsUnexpectedException;
 import io.airlift.airline.ParseOptionMissingException;
 import io.airlift.airline.ParseOptionMissingValueException;
 import org.openapitools.codegen.OpenAPIGenerator;
-import org.openapitools.codegen.cmd.*;
+import org.openapitools.codegen.cmd.AuthorTemplate;
+import org.openapitools.codegen.cmd.BuildInfo;
+import org.openapitools.codegen.cmd.CompletionCommand;
+import org.openapitools.codegen.cmd.ConfigHelp;
+import org.openapitools.codegen.cmd.GenerateBatch;
+import org.openapitools.codegen.cmd.HelpCommand;
+import org.openapitools.codegen.cmd.ListGenerators;
+import org.openapitools.codegen.cmd.Meta;
+import org.openapitools.codegen.cmd.OpenApiGeneratorCommand;
+import org.openapitools.codegen.cmd.Validate;
+import org.openapitools.codegen.cmd.Version;
 
 import java.util.Locale;
 

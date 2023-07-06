@@ -1,5 +1,0 @@
-// In this section you declare the dependencies for your production and test code
-dependencies {
-    // OpenAPI Generator
-    api group: 'org.openapitools', name: 'openapi-generator'
-}

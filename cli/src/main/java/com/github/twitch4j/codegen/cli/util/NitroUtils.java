@@ -11,6 +11,8 @@ import org.openapitools.codegen.CodegenConfig;
 import org.openapitools.codegen.CodegenOperation;
 import org.openapitools.codegen.DefaultGenerator;
 import org.openapitools.codegen.InlineModelResolver;
+import org.openapitools.codegen.model.ModelMap;
+import org.openapitools.codegen.model.ModelsMap;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -61,12 +63,11 @@ public class NitroUtils {
     /**
      * Generate Model Metadata
      */
-    public Map<String, Object> processModels(DefaultGenerator generator, CodegenConfig config, Map<String, Schema> definitions) {
+    public ModelsMap processModels(DefaultGenerator generator, CodegenConfig config, Map<String, Schema> definitions) {
         try {
             Method method = DefaultGenerator.class.getDeclaredMethod("processModels", CodegenConfig.class, Map.class);
             method.setAccessible(true);
-            var response = (Map<String, Object>) method.invoke(generator, config, definitions);
-            return response;
+            return (ModelsMap) method.invoke(generator, config, definitions);
         } catch (Exception ex) {
             log.error("failed to process model data", ex);
         }

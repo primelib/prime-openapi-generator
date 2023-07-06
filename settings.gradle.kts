@@ -5,5 +5,5 @@ include(
     "core",
     "java-feign",
     "cli",
-    "usage-example"
+    //"usage-example",
 )

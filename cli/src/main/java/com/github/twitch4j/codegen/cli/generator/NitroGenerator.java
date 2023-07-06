@@ -3,12 +3,11 @@ package com.github.twitch4j.codegen.cli.generator;
 import com.github.twitch4j.codegen.cli.domain.GeneratorContext;
 import com.github.twitch4j.codegen.cli.util.NitroUtils;
 import com.github.twitch4j.codegen.core.api.INitroCodegen;
-import com.github.twitch4j.codegen.core.api.INitroCodegenConfig;
 import com.github.twitch4j.codegen.core.domain.config.NitroCodegenFile;
-import com.github.twitch4j.codegen.core.domain.template.NitroGeneratorApiData;
-import com.github.twitch4j.codegen.core.domain.template.NitroGeneratorData;
 import com.github.twitch4j.codegen.core.domain.config.NitroIterator;
 import com.github.twitch4j.codegen.core.domain.config.NitroScope;
+import com.github.twitch4j.codegen.core.domain.template.NitroGeneratorApiData;
+import com.github.twitch4j.codegen.core.domain.template.NitroGeneratorData;
 import com.github.twitch4j.codegen.core.domain.template.NitroGeneratorModelData;
 import com.github.twitch4j.codegen.core.domain.template.NitroGeneratorOperationData;
 import io.swagger.v3.core.util.Json;
@@ -21,11 +20,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
-import org.openapitools.codegen.*;
+import org.openapitools.codegen.ClientOptInput;
+import org.openapitools.codegen.CodegenConfig;
+import org.openapitools.codegen.CodegenOperation;
+import org.openapitools.codegen.DefaultGenerator;
+import org.openapitools.codegen.Generator;
 import org.openapitools.codegen.config.GlobalSettings;
 import org.openapitools.codegen.meta.GeneratorMetadata;
 import org.openapitools.codegen.meta.Stability;
+import org.openapitools.codegen.model.ModelMap;
+import org.openapitools.codegen.model.ModelsMap;
 import org.openapitools.codegen.serializer.SerializerUtils;
+import org.openapitools.codegen.utils.CamelizeOption;
 import org.openapitools.codegen.utils.ImplementationVersion;
 import org.openapitools.codegen.utils.ModelUtils;
 import org.openapitools.codegen.utils.URLPathUtils;
@@ -35,10 +41,21 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Duration;
-import java.time.Instant;
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import static org.openapitools.codegen.utils.StringUtils.camelize;
@@ -144,7 +161,7 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
         // init
         INitroCodegen codegen = (INitroCodegen) config;
         List<NitroCodegenFile> files = codegen.cfg().getNitroFiles();
-        files.sort(Comparator.comparing(a -> Integer.valueOf(a.getScope().ordinal())));
+        files.sort(Comparator.comparing(a -> a.getScope().ordinal()));
         nitroGeneratorData.setConfig(codegen.cfg());
 
         // error prevention
@@ -237,7 +254,7 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
                     Map<String, Object> templateData = new HashMap<>(finalData.asMap());
                     processFile(ctx, file, name, templateData, file.getSkippedBy());
                 } catch (Exception ex) {
-                    log.warn("failed to generate file {} [Template: {}]", file.getTargetFileName(), file.getSourceTemplate());
+                    log.warn("failed to generate file {} [Template: {}]", file.getTargetFileName(), file.getSourceTemplate(), ex);
                 }
             });
         } else if (NitroIterator.EACH_API_OPERATION.equals(file.getIterator())) {
@@ -254,7 +271,7 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
                         Map<String, Object> templateData = new HashMap<>(finalData.asMap());
                         processFile(ctx, file, operation.getClassname(), templateData, file.getSkippedBy());
                     } catch (Exception ex) {
-                        log.warn("failed to generate file {} [Template: {}]", file.getTargetFileName(), file.getSourceTemplate());
+                        log.warn("failed to generate file {} [Template: {}]", file.getTargetFileName(), file.getSourceTemplate(), ex);
                     }
                 });
             });
@@ -276,11 +293,11 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
                 Map<String, Object> templateData = new HashMap<>(finalData.asMap());
                 processFile(ctx, file, file.getTargetFileName(), templateData, file.getSkippedBy());
             } catch (Exception ex) {
-                log.warn("failed to generate file {} [Template: {}]", file.getTargetFileName(), file.getSourceTemplate());
+                log.warn("failed to generate file {} [Template: {}]", file.getTargetFileName(), file.getSourceTemplate(), ex);
             }
 
-            //nitroGeneratorData.setModels(NitroGeneratorModelData.ofList(ctx.getModels().values(), this.config));
-            //nitroGeneratorData.setOperations(NitroGeneratorOperationData.ofList(ctx.getOperations().values(), this.config));
+            // nitroGeneratorData.setModels(NitroGeneratorModelData.ofList(ctx.getModels().values(), this.config));
+            // nitroGeneratorData.setOperations(NitroGeneratorOperationData.ofList(ctx.getOperations().values(), this.config));
             // nitroGeneratorData.setApi(NitroGeneratorApiData.of(ctx.getApiOperations(), this.config));
         } else if (NitroIterator.EACH_API.equals(file.getIterator())) {
             ctx.getApiKeys().stream().parallel().forEach(name -> {
@@ -293,7 +310,7 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
                     Map<String, Object> templateData = new HashMap<>(finalData.asMap());
                     processFile(ctx, file, name, templateData, file.getSkippedBy());
                 } catch (Exception ex) {
-                    log.warn("failed to generate file {} [Template: {}]", file.getTargetFileName(), file.getSourceTemplate());
+                    log.warn("failed to generate file {} [Template: {}]", file.getTargetFileName(), file.getSourceTemplate(), ex);
                 }
             });
         } else {
@@ -354,10 +371,13 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
         nitroGeneratorData.setTestPackage(this.config.testPackage());
         nitroGeneratorData.setInvokerPackage(this.config.apiPackage());
         if (openAPI.getInfo() != null) {
-            nitroGeneratorData.setMainClassName(camelize(openAPI.getInfo().getTitle(), false).replace(" ", ""));
+            nitroGeneratorData.setMainClassName(camelize(openAPI.getInfo().getTitle(), CamelizeOption.UPPERCASE_FIRST_CHAR).replace(" ", ""));
         } else {
-            nitroGeneratorData.setMainClassName(camelize("default", false));
+            nitroGeneratorData.setMainClassName(camelize("default", CamelizeOption.UPPERCASE_FIRST_CHAR));
         }
+        this.config.additionalProperties().put("mainClassName", nitroGeneratorData.getMainClassName());
+
+        nitroGeneratorData.setAdditionalProperties(this.config.additionalProperties());
 
         // debugging
         if (GlobalSettings.getProperty("debugOpenAPI") != null) {
@@ -421,6 +441,7 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
         } else if (NitroScope.API_DOCS.equals(file.getScope())) {
             fileName = fileName.replace("{name}", this.config.toApiDocFilename(name));
         }
+        fileName = fileName.replace("{mainClassName}", nitroGeneratorData.getMainClassName());
 
         return StringUtils.isEmpty(fileName) ? null : fileName;
     }
@@ -436,7 +457,7 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
 
         // which models should be generated?
         String modelNames = GlobalSettings.getProperty("models");
-        Set<String> modelsToGenerate = modelNames != null && !modelNames.isEmpty() ? new HashSet(Arrays.asList(modelNames.split(","))) : null;
+        Set<String> modelsToGenerate = modelNames != null && !modelNames.isEmpty() ? new HashSet<>(Arrays.asList(modelNames.split(","))) : null;
 
         // unused models
         List<String> unusedModels = ModelUtils.getSchemasUsedOnlyInFormParam(this.openAPI);
@@ -447,18 +468,11 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
 
         // filter to specific models, if the target model names have been provided
         Optional.ofNullable(modelsToGenerate).ifPresent(toGenerate -> {
-            Iterator<String> iterator = modelKeys.iterator();
-            while (iterator.hasNext()) {
-                String key = iterator.next();
-
-                if (!modelsToGenerate.contains(key)) {
-                    iterator.remove();
-                }
-            }
+            modelKeys.removeIf(key -> !modelsToGenerate.contains(key));
         });
         ctx.setModelKeys(modelKeys);
 
-        Map<String, Object> allProcessedModels = new TreeMap((o1, o2) -> ObjectUtils.compare(this.config.toModelName((String) o1), this.config.toModelName((String) o2)));
+        Map<String, ModelsMap> allProcessedModels = new TreeMap((o1, o2) -> ObjectUtils.compare(this.config.toModelName((String) o1), this.config.toModelName((String) o2)));
         Boolean skipFormModel = nitroGeneratorData.getGenerateSkipFormModel();
         modelKeys.forEach(name -> {
             try {
@@ -482,11 +496,11 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
                         log.info("Model {} (marked as unused due to form parameters) is generated due to the global property `skipFormModel` set to false", name);
                     }
 
-                    Schema schema = (Schema)schemas.get(name);
+                    Schema schema = schemas.get(name);
                     if (ModelUtils.isFreeFormObject(this.openAPI, schema)) {
                         Schema refSchema = new Schema();
                         refSchema.set$ref("#/components/schemas/" + name);
-                        Schema unaliasedSchema = this.config.unaliasSchema(refSchema, this.config.importMapping());
+                        Schema unaliasedSchema = this.config.unaliasSchema(refSchema);
                         if (unaliasedSchema.get$ref() == null) {
                             log.info("Model {} not generated since it's a free-form object", name);
                             return;
@@ -503,7 +517,7 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
 
                     Map<String, Schema> schemaMap = new HashMap();
                     schemaMap.put(name, schema);
-                    Map modelTemplate = NitroUtils.processModels(this, this.config, schemaMap);
+                    ModelsMap modelTemplate = NitroUtils.processModels(this, this.config, schemaMap);
                     // TODO: Map modelTemplate = processModels(this.config, schemaMap);
                     modelTemplate.put("classname", this.config.toModelName(name));
                     modelTemplate.putAll(this.config.additionalProperties());
@@ -515,7 +529,7 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
         });
 
         // run update / post process on the final data
-        Map<String, Object> processedModels = this.config.updateAllModels(allProcessedModels);
+        Map<String, ModelsMap> processedModels = this.config.updateAllModels(allProcessedModels);
         processedModels = this.config.postProcessAllModels(processedModels);
         Map<String, Map<String, Object>> modelData = processedModels.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> (Map<String, Object>) e.getValue()));
         ctx.setModels(modelData);

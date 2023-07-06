@@ -28,9 +28,8 @@ public class PebbleEngineAdapter implements TemplatingEngineAdapter {
     @Getter
     private final String[] fileExtensions = new String[]{"peb", "pebble"};
 
-    private CodeGeneratorTemplateExecutorLoader loader;
-
-    private PebbleEngine engine;
+    private final CodeGeneratorTemplateExecutorLoader loader;
+    private final PebbleEngine engine;
 
     public PebbleEngineAdapter() {
         loader = new CodeGeneratorTemplateExecutorLoader();

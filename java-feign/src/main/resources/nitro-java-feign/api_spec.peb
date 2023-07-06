@@ -1,7 +1,7 @@
 {# @pebvariable name="t" type="com.github.twitch4j.codegen.core.domain.template.NitroGeneratorData" #}
 {# @pebvariable name="cfg" type="com.github.twitch4j.codegen.java.feign.config.JavaFeignGeneratorConfig" #}
 {% include "./licenseInfo.peb" %}
-package {{ t.modelPackage }};
+package {{ t.additionalProperties.get("specPackage") }};
 
 {% include "./import.peb" with {"cfg": cfg, "imports": t.api.imports} %}
 import feign.*;

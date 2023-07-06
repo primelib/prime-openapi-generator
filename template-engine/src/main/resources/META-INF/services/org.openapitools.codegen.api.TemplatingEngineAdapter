@@ -1,3 +1,2 @@
 com.github.twitch4j.codegen.engine.AutoEngineAdapter
 com.github.twitch4j.codegen.engine.PebbleEngineAdapter
-com.github.twitch4j.codegen.engine.JtwigEngineAdapter

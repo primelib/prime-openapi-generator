@@ -2,6 +2,8 @@ package com.github.twitch4j.codegen.java.feign.utils;
 
 import lombok.experimental.UtilityClass;
 
+import java.io.File;
+
 @UtilityClass
 public class JavaCodegenUtils {
 
@@ -12,8 +14,8 @@ public class JavaCodegenUtils {
      * @param packageName
      * @return
      */
-    public String packageToPath(String sourceFolder, String packageName) {
-        return (sourceFolder + "/" + packageName).replace(".", "/");
+    public String packageToPath(String outputFolder, String sourceFolder, String packageName) {
+        return (outputFolder + File.separator + sourceFolder + File.separator + packageName).replace(".", File.separator);
     }
 
 }

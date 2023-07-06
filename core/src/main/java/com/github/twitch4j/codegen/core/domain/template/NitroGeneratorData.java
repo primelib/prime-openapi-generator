@@ -59,6 +59,7 @@ public class NitroGeneratorData {
     private String testPackage;
     private String invokerPackage;
     private String mainClassName;
+    private Map<String, Object> additionalProperties = new HashMap<>();
 
     /**
      * OpenAPI Info - Name
