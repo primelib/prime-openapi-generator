@@ -2,7 +2,12 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
     id("application")
+    id("me.philippheuer.configuration")
     id("com.github.johnrengelman.shadow")
+}
+
+projectConfiguration {
+    type.set(me.philippheuer.projectcfg.domain.ProjectType.APP)
 }
 
 dependencies {
@@ -10,7 +15,7 @@ dependencies {
 
     implementation(project(":core"))
     implementation(project(":template-engine"))
-    implementation(project(":java-feign"))
+    implementation(project(":gen-java-feign"))
 
     // logging
     implementation("org.slf4j:slf4j-simple:2.0.7")

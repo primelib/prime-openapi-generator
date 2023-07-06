@@ -1,0 +1,81 @@
+{# @pebvariable name="t" type="io.github.primelib.primecodegen.core.domain.template.NitroGeneratorData" #}
+{# @pebvariable name="cfg" type="io.github.primelib.primecodegen.javafeign.config.JavaFeignGeneratorConfig" #}
+{% include "./licenseInfo.peb" %}
+package {{ t.additionalProperties.get("invokerPackage") }};
+
+{% include "./import.peb" with {"t": t, "imports": t.api.imports} %}
+import {{ t.apiPackage }}.{{ t.mainClassName }};
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import feign.Logger;
+import feign.jackson.JacksonDecoder;
+import feign.jackson.JacksonEncoder;
+import feign.okhttp.OkHttpClient;
+import feign.slf4j.Slf4jLogger;
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import io.github.resilience4j.feign.FeignDecorators;
+import io.github.resilience4j.feign.Resilience4jFeign;
+import io.github.resilience4j.ratelimiter.RateLimiter;
+import io.github.resilience4j.retry.Retry;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+import java.util.function.Consumer;
+
+{# Information #}
+@NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
+@Slf4j
+@Generated(value = "{{ t.generatorClass }}"{% if not cfg.hideGenerationTimestamp %}, date = "{{ t.generatorDate }}"{% endif %})
+public class {{ t.mainClassName }}Factory {
+    private static final ObjectMapper MAPPER = JsonMapper.builder()
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+            .propertyNamingStrategy(PropertyNamingStrategies.LOWER_CAMEL_CASE)
+            .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
+            .build();
+
+    public static <T> T build(Consumer<{{ t.mainClassName }}FactorySpec<T>> spec) {
+        {{ t.mainClassName }}FactorySpec<T> config = new {{ t.mainClassName }}FactorySpec<>(spec);
+
+        if (config.api().isInterface()) {
+            return buildClient(spec);
+        } else {
+            try {
+                {{ t.mainClassName }} api = buildClient(s -> {
+                    s.api({{ t.mainClassName }}.class);
+                    s.backendName(config.backendName());
+                    s.baseUrl(config.baseUrl());
+                });
+                return config.api().getConstructor({{ t.mainClassName }}.class).newInstance(api);
+            } catch (Exception e) {
+                throw new IllegalArgumentException("api must have a constructor with one parameter of type PerspectiveApi");
+            }
+        }
+    }
+
+    public static {{ t.mainClassName }} build() {
+        return build(spec -> spec.api({{ t.mainClassName }}.class));
+    }
+
+    private static <T> T buildClient(Consumer<{{ t.mainClassName }}FactorySpec<T>> spec) {
+        {{ t.mainClassName }}FactorySpec<T> config = new {{ t.mainClassName }}FactorySpec<>(spec);
+
+        FeignDecorators decorators = FeignDecorators.builder()
+                .withRateLimiter(RateLimiter.ofDefaults(config.backendName()))
+                .withCircuitBreaker(CircuitBreaker.ofDefaults(config.backendName()))
+                .withRetry(Retry.ofDefaults(config.backendName()))
+                .build();
+
+        return Resilience4jFeign
+                .builder(decorators)
+                .client(new OkHttpClient())
+                .encoder(new JacksonEncoder(MAPPER))
+                .decoder(new JacksonDecoder(MAPPER))
+                .logger(new Slf4jLogger())
+                .logLevel(Logger.Level.NONE)
+                .target(config.api(), config.baseUrl());
+    }
+}

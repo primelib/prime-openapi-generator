@@ -1,9 +1,8 @@
 rootProject.name = "primecodegen"
 
 include(
-    "template-engine",
     "core",
-    "java-feign",
+    "template-engine",
+    "gen-java-feign",
     "cli",
-    //"usage-example",
 )

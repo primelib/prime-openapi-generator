@@ -1,0 +1,39 @@
+/**
+ * {% if model.title is empty %}{{ model.classname }}{{ else }}{{ model.title }}{% endif %}{{ newline() }}
+ * {{ model.description }}{{ newline() }}
+ *
+{% if model.isDeprecated %} * @deprecated{% if model.vendorExtensions['x-deprecated'] is not empty %} {{ model.vendorExtensions['x-deprecated'] }}{% endif %}{{ newline() }}{% endif %}
+ */
+{# Information #}
+{% if model.description is not empty %}@Schema(description = "{{ model.description }}"){{ newline() }}{% endif %}
+@Generated(value = "{{ generatorClass }}"{% if not hideGenerationTimestamp %}, date = "{{ generatedDate }}"{% endif %})
+{# JSON - Jackson #}
+@JsonPropertyOrder({
+{% for var in model.vars %}
+    "{{ var.baseName }}"{% if not loop.last %},{% endif %}{{ newline() }}
+{% endfor %}
+})
+@JsonTypeName("{{ model.name }}")
+{# Deprecated #}
+    {% if model.isDeprecated %}@Deprecated{{ newline() }}{% endif %}
+@Data
+public class {{ model.classname }}{% if model.parent is not empty %} extends {{ model.parent }}{% endif %} {
+{% if serializableModel %}
+    private static final long serialVersionUID = 1L;
+{% endif %}
+
+    {% for var in model.vars %}
+    @JsonProperty("{{ var.baseName }}")
+    private {{ var.datatypeWithEnum }} {{var.name}}{% if var.defaultValue is not empty %} = {{ var.defaultValue }}{% endif %};
+
+{% endfor %}
+
+    public {{ dataType }} getValue() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(value);
+    }
+}
