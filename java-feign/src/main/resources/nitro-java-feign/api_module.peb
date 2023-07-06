@@ -6,10 +6,9 @@ package {{ t.apiPackage }};
 {% include "./import.peb" with {"t": t, "imports": t.api.imports} %}
 import feign.*;
 
-{{ operation.summary }}
 {% for operation in t.api.operations %}
 {% if cfg.requestOverloadSpec and operation.hasParams %}
-import {{ t.modelPackage }}.{{ operation.nickname | capitalize }}Spec;
+import {{ t.additionalProperties.get("specPackage") }}.{{ operation.nickname | capitalize }}Spec;
 {% endif %}
 {% endfor %}
 
@@ -19,6 +18,7 @@ import {{ t.modelPackage }}.{{ operation.nickname | capitalize }}Spec;
 public interface {{ t.api.classname }} {
 
 {% for operation in t.api.operations %}
+{# @pebvariable name="operation" type="org.openapitools.codegen.CodegenOperation" #}
 {# DEFAULT METHOD #}
 {% include "./javadoc_method.peb" %}{{ newline() }}
 {# Deprecated #}
@@ -32,45 +32,6 @@ public interface {{ t.api.classname }} {
     )
 {% endif %}
     {% if operation.returnType is not empty %}{{ operation.returnType }}{% else %}void{% endif %} {{ operation.nickname }}({% for param in operation.allParams %}{% if param.isHeaderParam or param.isQueryParam %}@Param("{{ param.paramName }}"){% endif %} {% include "./param_annotation.peb" %}{{ param.dataType }} {{ param.paramName }}{% if not loop.last %}, {% endif %}{% endfor %});
-
-{# OVERLOAD - MAP #}
-{% if cfg.requestOverloadMap and operation.hasParams %}
-    /**
-     * {{ operation.summary }}{{ newline() }}
-     *
-{% if operation.notes is not empty %}
-     * {{ operation.notes }}{{ newline() }}
-     *
-{% endif %}
-{# Authentcation #}
-{% if operation.vendorExtensions['x-required-scopes'] is not empty %}
-     * Authentication - Required Scopes: {{ operation.vendorExtensions['x-required-scopes'] }}{{ newline() }}
-{% endif %}
-{# Params & ReturnType #}
-     * @param {{ "params" | padright(20) }} a key-value map that contains all query parameters (required){{ newline() }}
-{% if operation.returnType is not empty %}
-     * @return {{ operation.returnType }}{{ newline() }}
-{% endif %}
-{# External Documentation #}
-{% if operation.externalDocs is not empty %}
-     * @see <a href="{{ operation.externalDocs.url }}">{{ operation.externalDocs.description }}</a>
-{% endif %}
-{# Deprecated #}
-{% if operation.isDeprecated %}
-     * @deprecated{% if operation.vendorExtensions['x-deprecated'] is not empty %} {{ operation.vendorExtensions['x-deprecated'] }}{% endif %}{{ newline() }}
-{% endif %}
-     */
-    default {% if operation.returnType is not empty %}{{ operation.returnType }}{% else %}void{% endif %} {{ operation.nickname }}(Map<String, Object> params) {
-{# Parameter Validation #}
-{% for param in operation.allParams %}
-{% if param.required %}
-        Objects.requireNonNull(params.get("{{ param.paramName }}"), "{{ param.paramName }} is a required parameter!");
-{% endif %}
-{% endfor %}
-
-        {% if operation.returnType is not empty %}return {% endif %}{{ operation.nickname }}({% for param in operation.allParams %}({{ param.dataType }}) params.get("{{ param.paramName }}"){% if not loop.last %}, {% endif %}{% endfor %});
-    }
-{% endif %}
 
 {# OVERLOAD - SPEC #}
 {% if cfg.requestOverloadSpec and operation.hasParams %}
@@ -100,7 +61,7 @@ public interface {{ t.api.classname }} {
 {% endif %}
      */
     default {% if operation.returnType is not empty %}{{ operation.returnType }}{% else %}void{% endif %} {{ operation.nickname }}(Consumer<{{ operation.nickname | capitalize }}Spec> spec) {
-        {{ operation.nickname | capitalize }}Spec finalSpec = {{ operation.nickname | capitalize }}Spec.process(spec);
+        {{ operation.nickname | capitalize }}Spec finalSpec = new {{ operation.nickname | capitalize }}Spec(spec);
         {% if operation.returnType is not empty %}return {% endif %}{{ operation.nickname }}({% for param in operation.allParams %}finalSpec.{{ param.paramName }}(){% if not loop.last %}, {% endif %}{% endfor %});
     }
 

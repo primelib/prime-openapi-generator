@@ -11,7 +11,6 @@ import org.openapitools.codegen.CodegenConfig;
 import org.openapitools.codegen.CodegenOperation;
 import org.openapitools.codegen.DefaultGenerator;
 import org.openapitools.codegen.InlineModelResolver;
-import org.openapitools.codegen.model.ModelMap;
 import org.openapitools.codegen.model.ModelsMap;
 
 import java.io.File;

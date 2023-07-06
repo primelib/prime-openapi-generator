@@ -3,6 +3,7 @@ package com.github.twitch4j.codegen.core.domain.config;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
+import org.jetbrains.annotations.NotNull;
 
 @Getter
 @ToString
@@ -13,6 +14,7 @@ public class NitroCodegenFile {
 
     private String targetDirectory;
 
+    @NotNull
     private String targetFileName;
 
     /**

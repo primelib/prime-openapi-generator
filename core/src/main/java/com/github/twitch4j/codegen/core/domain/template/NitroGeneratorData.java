@@ -57,7 +57,6 @@ public class NitroGeneratorData {
     private String apiPackage;
     private String modelPackage;
     private String testPackage;
-    private String invokerPackage;
     private String mainClassName;
     private Map<String, Object> additionalProperties = new HashMap<>();
 

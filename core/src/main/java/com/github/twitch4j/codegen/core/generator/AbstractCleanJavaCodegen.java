@@ -10,12 +10,8 @@ import org.openapitools.codegen.CodegenProperty;
 import org.openapitools.codegen.languages.AbstractJavaCodegen;
 import org.openapitools.codegen.model.ModelMap;
 import org.openapitools.codegen.model.OperationsMap;
-import org.openapitools.codegen.utils.CamelizeOption;
 
 import java.util.List;
-import java.util.Objects;
-
-import static org.openapitools.codegen.utils.StringUtils.camelize;
 
 /**
  * AbstractCleanJavaCodegen

@@ -1,4 +1,6 @@
 {# @pebvariable name="t" type="com.github.twitch4j.codegen.core.domain.template.NitroGeneratorData" #}
+{# @pebvariable name="cfg" type="com.github.twitch4j.codegen.java.feign.config.JavaFeignGeneratorConfig" #}
+{% if not cfg.hideLicense %}
 /*
  * {{ t.appName }}{{ newline() }}
  *
@@ -13,3 +15,4 @@
  * Generator: {{ t.generatorClass }} - {{ t.generatorVersion }}{{ newline() }}
  * Do not edit the class manually.
  */
+{% endif %}

@@ -1,5 +1,6 @@
 package com.github.twitch4j.codegen.engine;
 
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.openapitools.codegen.api.TemplatingEngineAdapter;
@@ -8,31 +9,21 @@ import org.openapitools.codegen.templating.HandlebarsEngineAdapter;
 import org.openapitools.codegen.templating.MustacheEngineAdapter;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+@NoArgsConstructor
 @Slf4j
 public class AutoEngineAdapter implements TemplatingEngineAdapter {
 
-    private static List<TemplatingEngineAdapter> engineAdapters = new ArrayList<>();
-
-    private static List<String> extensions = new ArrayList<>();
-
-    public AutoEngineAdapter() {
-        // load all known adapters, just once
-        if (engineAdapters.isEmpty()) {
-            engineAdapters.add(new MustacheEngineAdapter());
-            engineAdapters.add(new HandlebarsEngineAdapter());
-            engineAdapters.add(new PebbleEngineAdapter());
-
-            engineAdapters.forEach(adapter-> {
-                log.info("registered template engine adapter {}!", adapter.getIdentifier());
-                extensions.addAll(Arrays.asList(adapter.getFileExtensions()));
-            });
-        }
-    }
+    private static final List<TemplatingEngineAdapter> engineAdapters = List.of(
+        new MustacheEngineAdapter(),
+        new HandlebarsEngineAdapter(),
+        new PebbleEngineAdapter()
+    );
+    private static final List<String> extensions = engineAdapters.stream().map(TemplatingEngineAdapter::getFileExtensions).flatMap(Arrays::stream).collect(Collectors.toUnmodifiableList());
 
     @Override
     public String getIdentifier() {

@@ -3,12 +3,17 @@ package com.github.twitch4j.codegen.core.util;
 import lombok.experimental.UtilityClass;
 
 import java.io.File;
-import java.util.Set;
+import java.util.List;
 
 @UtilityClass
 public class GeneratorUtils {
 
-    public void createOutputDirectories(Set<String> directories) {
+    /**
+     * Creates the output directories if they don't exist.
+     *
+     * @param directories A list of directories to create.
+     */
+    public void createOutputDirectories(List<String> directories) {
         for (String directory : directories) {
             File directoryFile = new File(directory);
             if (!directoryFile.exists()) {

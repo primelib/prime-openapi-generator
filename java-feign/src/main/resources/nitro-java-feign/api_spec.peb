@@ -4,13 +4,22 @@
 package {{ t.additionalProperties.get("specPackage") }};
 
 {% include "./import.peb" with {"cfg": cfg, "imports": t.api.imports} %}
-import feign.*;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * {{ t.operation.classname }}Spec
+ * <p>
+ * Specification for the {{ t.operation.classname }} operation.
+ * <p>
+ * {{ t.operation.codegenOperation.summary }}{{ newline() }}
  *
- * This class is used to set request parameters when using the spec method.
- *
+{% if t.operation.codegenOperation.allParams is not empty %}
  * Required Parameters:
 {% for param in t.operation.codegenOperation.allParams %}
 {% if param.required %}
@@ -23,28 +32,39 @@ import feign.*;
  * - {{ param.paramName }} {{ param.description }}{{ newline() }}
 {% endif %}
 {% endfor %}
+{% endif %}
  */
 {# Information #}
 {% if description is not empty %}@Schema(description = "{{ description }}"){{ newline() }}{% endif %}
+@Data
+@Accessors(fluent = true)
+@NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
 @Generated(value = "{{ t.generatorClass }}"{% if not cfg.hideGenerationTimestamp %}, date = "{{ t.generatorDate }}"{% endif %})
 public class {{ t.operation.classname }}Spec {
 
 {% for param in t.operation.codegenOperation.allParams %}
+    /**
+     * {{ param.description }}{{ newline() }}
+     */
+    {% if param.required %}@NotNull{% else %}@Nullable{% endif %}{{ newline() }}
     private {{ param.dataType }} {{ param.paramName }};
 {% endfor %}
 
     /**
-     * Process Spec
+     * Constructs a validated implementation of {@link {{ t.operation.classname }}Spec}.
+     *
+     * @param spec the specification to process
      */
-    public static {{ t.operation.classname }}Spec process(Consumer<{{ t.operation.classname }}Spec> spec) {
-        {{ t.operation.classname }}Spec data = new {{ t.operation.classname }}Spec();
-        spec.accept(data);
-        data.validate();
-        return data;
+    @ApiStatus.Internal
+    public {{ t.operation.classname }}Spec(Consumer<{{ t.operation.classname }}Spec> spec) {
+        spec.accept(this);
+        validate();
     }
 
     /**
      * Validates the Spec, will throw a exception if required parameters are missing
+     *
+     * @throws NullPointerException
      */
     public void validate() {
 {% for param in t.operation.codegenOperation.allParams %}
@@ -54,27 +74,4 @@ public class {{ t.operation.classname }}Spec {
 {% endfor %}
     }
 
-{% for param in t.operation.codegenOperation.allParams %}
-    /**
-     * Set {{ param.paramName }}{{ newline() }}
-     *
-     * {% include "./javadoc_param.peb" %}
-     * @return {{ t.operation.classname }}Spec
-     */
-    public {{ t.operation.classname }}Spec {{ param.paramName }}({% include "./param_annotation.peb" %}{{ param.dataType }} {{ param.paramName }}) {
-{% if param.dataType startswith "Map<" %}
-        this.{{ param.paramName }} = Collections.unmodifiableMap({{ param.paramName }});
-{% elseif param.dataType startswith "List<" %}
-        this.{{ param.paramName }} = Collections.unmodifiableList({{ param.paramName }});
-{% else %}
-        this.{{ param.paramName }} = {{ param.paramName }};
-{% endif %}
-        return this;
-    }
-
-    public {{ param.dataType }} {{ param.paramName }}() {
-        return this.{{ param.paramName }};
-    }
-
-{% endfor %}
 }

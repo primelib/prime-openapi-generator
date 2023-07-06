@@ -6,4 +6,5 @@ public enum NitroIterator {
     EACH_API_OPERATION,
     ONCE_MODEL,
     EACH_MODEL,
+    ONCE_PROJECT,
 }

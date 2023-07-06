@@ -11,8 +11,6 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":template-engine"))
     implementation(project(":java-feign"))
-
-    implementation("org.jetbrains:annotations:16.0.2")
 }
 
 application {

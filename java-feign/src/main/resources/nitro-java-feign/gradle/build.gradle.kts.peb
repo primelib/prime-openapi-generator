@@ -1,0 +1,34 @@
+plugins {
+    `java-library`
+    id("me.philippheuer.configuration") version "0.10.5"
+}
+
+val version: String = properties["version"] as? String ?: "0.0.0"
+
+projectConfiguration {
+    type.set(me.philippheuer.projectcfg.domain.ProjectType.LIBRARY)
+    javaVersion.set(JavaVersion.VERSION_1_8)
+}
+
+dependencies {
+    // bom
+    api(platform("io.github.openfeign:feign-bom:12.3"))
+
+    // annotations
+    implementation("org.jetbrains:annotations:24.0.1")
+
+    // feign
+    implementation("io.github.openfeign:feign-core")
+    implementation("io.github.openfeign:feign-jackson")
+    implementation("io.github.openfeign:feign-slf4j")
+    implementation("io.github.openfeign:feign-okhttp")
+
+    // resilience4J
+    implementation("io.github.resilience4j:resilience4j-feign:1.7.1")
+    implementation("io.github.resilience4j:resilience4j-retry:1.7.1")
+    implementation("io.github.resilience4j:resilience4j-circuitbreaker:1.7.1")
+    implementation("io.github.resilience4j:resilience4j-ratelimiter:1.7.1")
+
+    // test
+    testImplementation("org.slf4j:slf4j-simple:2.0.7")
+}

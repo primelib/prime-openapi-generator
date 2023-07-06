@@ -28,7 +28,6 @@ import org.openapitools.codegen.Generator;
 import org.openapitools.codegen.config.GlobalSettings;
 import org.openapitools.codegen.meta.GeneratorMetadata;
 import org.openapitools.codegen.meta.Stability;
-import org.openapitools.codegen.model.ModelMap;
 import org.openapitools.codegen.model.ModelsMap;
 import org.openapitools.codegen.serializer.SerializerUtils;
 import org.openapitools.codegen.utils.CamelizeOption;
@@ -232,6 +231,8 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
                 generateNitroFileApi(ctx, file, !nitroGeneratorData.getGenerateApis());
             } else if (NitroScope.API_TEST.equals(file.getScope())) {
                 generateNitroFileApi(ctx, file, !nitroGeneratorData.getGenerateApiTests());
+            } else if (NitroScope.SUPPORT.equals(file.getScope())) {
+                generateSupportingFile(ctx, file, !nitroGeneratorData.getGenerateSupportingFiles());
             } else {
                 log.error("failed to generate file {}, not supported! [Scope:{}]", file.getSourceTemplate(), file.getScope());
             }
@@ -318,6 +319,20 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
         }
     }
 
+    protected void generateSupportingFile(GeneratorContext ctx, NitroCodegenFile file, Boolean skipped) throws IOException {
+        if (skipped) return;
+
+        try {
+            NitroGeneratorData finalData = nitroGeneratorData.toBuilder()
+                .models(NitroGeneratorModelData.ofList(ctx.getModels().values(), this.config))
+                .build();
+            Map<String, Object> templateData = new HashMap<>(finalData.asMap());
+            processFile(ctx, file, file.getTargetFileName(), templateData, file.getSkippedBy());
+        } catch (Exception ex) {
+            log.warn("failed to generate file {} [Template: {}]", file.getTargetFileName(), file.getSourceTemplate(), ex);
+        }
+    }
+
     /**
      * processes a file and writes it to disk
      *
@@ -330,15 +345,20 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
      */
     private void processFile(@NotNull GeneratorContext ctx, @NotNull NitroCodegenFile file, @NotNull String name, @NotNull Map<String, Object> templateData, @NotNull String skippedBy) throws IOException {
         String filename = file.getTargetDirectory() + File.separator + this.getFilename(file, name);
-        log.debug("generating file {} from template {}", filename, file.getSourceTemplate());
 
-        File written = this.processTemplateToFile(templateData, file.getSourceTemplate(), filename, nitroGeneratorData.getGenerateModels(), skippedBy);
-        if (written != null) {
-            if (this.config.isEnablePostProcessFile() && !nitroGeneratorData.getDryRun()) {
-                this.config.postProcessFile(written, file.getPostProcessType());
+        if (StringUtils.isNotEmpty(file.getSourceTemplate())) {
+            log.debug("generating file {} from template {}", filename, file.getSourceTemplate());
+
+            File written = this.processTemplateToFile(templateData, file.getSourceTemplate(), filename, nitroGeneratorData.getGenerateModels(), skippedBy);
+            if (written != null) {
+                if (this.config.isEnablePostProcessFile() && !nitroGeneratorData.getDryRun()) {
+                    this.config.postProcessFile(written, file.getPostProcessType());
+                }
+
+                ctx.getFiles().add(written);
             }
-
-            ctx.getFiles().add(written);
+        } else {
+            throw new RuntimeException("No template or source file specified for " + file.getTargetFileName());
         }
     }
 
@@ -355,7 +375,7 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
         nitroGeneratorData.setGenerateModelTests(GlobalSettings.getProperty("modelTests") != null ? Boolean.TRUE : Boolean.parseBoolean(this.generatorPropertyDefaults.getOrDefault("modelTests", "true")));
         nitroGeneratorData.setGenerateModelDocumentation(GlobalSettings.getProperty("modelDocs") != null ? Boolean.TRUE : Boolean.parseBoolean(this.generatorPropertyDefaults.getOrDefault("modelDocs", "true")));
         nitroGeneratorData.setGenerateSupportingFiles(GlobalSettings.getProperty("supportingFiles") != null ? Boolean.TRUE : Boolean.parseBoolean(this.generatorPropertyDefaults.getOrDefault("supportingFiles", "true")));
-        nitroGeneratorData.setGenerateSupportingFiles(GlobalSettings.getProperty("skipFormModel") != null ? Boolean.TRUE : Boolean.parseBoolean(this.generatorPropertyDefaults.getOrDefault("skipFormModel", "false")));
+        nitroGeneratorData.setGenerateSkipFormModel(GlobalSettings.getProperty("skipFormModel") != null ? Boolean.TRUE : Boolean.parseBoolean(this.generatorPropertyDefaults.getOrDefault("skipFormModel", "false")));
         nitroGeneratorData.setDebugOpenAPI(GlobalSettings.getProperty("debugOpenAPI") != null);
 
         // generator version
@@ -369,7 +389,6 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
         nitroGeneratorData.setApiPackage(this.config.apiPackage());
         nitroGeneratorData.setModelPackage(this.config.modelPackage());
         nitroGeneratorData.setTestPackage(this.config.testPackage());
-        nitroGeneratorData.setInvokerPackage(this.config.apiPackage());
         if (openAPI.getInfo() != null) {
             nitroGeneratorData.setMainClassName(camelize(openAPI.getInfo().getTitle(), CamelizeOption.UPPERCASE_FIRST_CHAR).replace(" ", ""));
         } else {
@@ -425,6 +444,7 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
     /**
      * replaces all placeholders in the filename
      */
+    @NotNull
     protected String getFilename(NitroCodegenFile file, String name) {
         String fileName = file.getTargetFileName();
 
@@ -443,7 +463,7 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
         }
         fileName = fileName.replace("{mainClassName}", nitroGeneratorData.getMainClassName());
 
-        return StringUtils.isEmpty(fileName) ? null : fileName;
+        return fileName;
     }
 
     protected void prepareModelTemplateData(GeneratorContext ctx) {

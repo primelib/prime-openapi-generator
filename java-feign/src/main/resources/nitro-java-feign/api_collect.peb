@@ -4,10 +4,11 @@
 package {{ t.apiPackage }};
 
 {% include "./import.peb" with {"t": t, "imports": t.api.imports} %}
-import feign.*;
+import org.jetbrains.annotations.ApiStatus;
 
 {# Information #}
+@ApiStatus.Internal
 @Generated(value = "{{ t.generatorClass }}"{% if not cfg.hideGenerationTimestamp %}, date = "{{ t.generatorDate }}"{% endif %})
-public interface {{ t.mainClassName }}ApiCollection extends {% for api in t.apis %}{{ api.classname }}{% if not loop.last %}, {% endif %}{% endfor %} {
+interface {{ t.mainClassName }}ApiCollection extends {% for api in t.apis %}{{ api.classname }}{% if not loop.last %}, {% endif %}{% endfor %} {
 
 }

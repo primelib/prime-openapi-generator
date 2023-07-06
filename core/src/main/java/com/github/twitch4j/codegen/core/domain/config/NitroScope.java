@@ -9,5 +9,5 @@ public enum NitroScope {
     API_DOCS,
     INVOKE,
     INVOKE_TEST,
-    PROJECT,
+    SUPPORT,
 }
