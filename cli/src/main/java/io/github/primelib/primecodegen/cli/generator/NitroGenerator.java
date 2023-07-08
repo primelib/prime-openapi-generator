@@ -2,10 +2,10 @@ package io.github.primelib.primecodegen.cli.generator;
 
 import io.github.primelib.primecodegen.cli.domain.GeneratorContext;
 import io.github.primelib.primecodegen.cli.util.NitroUtils;
-import io.github.primelib.primecodegen.core.api.INitroCodegen;
-import io.github.primelib.primecodegen.core.domain.config.NitroCodegenFile;
-import io.github.primelib.primecodegen.core.domain.config.NitroIterator;
-import io.github.primelib.primecodegen.core.domain.config.NitroScope;
+import io.github.primelib.primecodegen.core.api.PrimeCodegenBase;
+import io.github.primelib.primecodegen.core.domain.config.PrimeIterator;
+import io.github.primelib.primecodegen.core.domain.config.PrimeTemplateSpec;
+import io.github.primelib.primecodegen.core.domain.config.TemplateScope;
 import io.github.primelib.primecodegen.core.domain.template.NitroGeneratorApiData;
 import io.github.primelib.primecodegen.core.domain.template.NitroGeneratorData;
 import io.github.primelib.primecodegen.core.domain.template.NitroGeneratorModelData;
@@ -142,7 +142,7 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
             }
         }
 
-        if (INitroCodegen.class.isAssignableFrom(config.getClass())) {
+        if (PrimeCodegenBase.class.isAssignableFrom(config.getClass())) {
             // nitro generator
             files.addAll(this.generateNitro());
         } else {
@@ -158,8 +158,8 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
      */
     public synchronized List<File> generateNitro() {
         // init
-        INitroCodegen codegen = (INitroCodegen) config;
-        List<NitroCodegenFile> files = codegen.cfg().getNitroFiles();
+        PrimeCodegenBase codegen = (PrimeCodegenBase) config;
+        List<PrimeTemplateSpec> files = codegen.cfg().getTemplateSpecs();
         files.sort(Comparator.comparing(a -> a.getScope().ordinal()));
         nitroGeneratorData.setConfig(codegen.cfg());
 
@@ -219,19 +219,19 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
         return new ArrayList<>();
     }
 
-    public void generateNitroFile(GeneratorContext ctx, NitroCodegenFile file) {
+    public void generateNitroFile(GeneratorContext ctx, PrimeTemplateSpec file) {
         log.info("generating file {} [Scope:{}]", file.getSourceTemplate(), file.getScope());
 
         try {
-            if (NitroScope.MODEL.equals(file.getScope())) {
+            if (TemplateScope.MODEL.equals(file.getScope())) {
                 generateNitroFileModel(ctx, file, !nitroGeneratorData.getGenerateModels());
-            } else if (NitroScope.MODEL_TEST.equals(file.getScope())) {
+            } else if (TemplateScope.MODEL_TEST.equals(file.getScope())) {
                 generateNitroFileModel(ctx, file, !nitroGeneratorData.getGenerateModelTests());
-            } else if (NitroScope.API.equals(file.getScope())) {
+            } else if (TemplateScope.API.equals(file.getScope())) {
                 generateNitroFileApi(ctx, file, !nitroGeneratorData.getGenerateApis());
-            } else if (NitroScope.API_TEST.equals(file.getScope())) {
+            } else if (TemplateScope.API_TEST.equals(file.getScope())) {
                 generateNitroFileApi(ctx, file, !nitroGeneratorData.getGenerateApiTests());
-            } else if (NitroScope.SUPPORT.equals(file.getScope())) {
+            } else if (TemplateScope.SUPPORT.equals(file.getScope())) {
                 generateSupportingFile(ctx, file, !nitroGeneratorData.getGenerateSupportingFiles());
             } else {
                 log.error("failed to generate file {}, not supported! [Scope:{}]", file.getSourceTemplate(), file.getScope());
@@ -241,36 +241,32 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
         }
     }
 
-    protected void generateNitroFileModel(GeneratorContext ctx, NitroCodegenFile file, Boolean skipped) throws IOException {
+    protected void generateNitroFileModel(GeneratorContext ctx, PrimeTemplateSpec file, Boolean skipped) throws IOException {
         if (skipped) return;
 
-        if (NitroIterator.ONCE_MODEL.equals(file.getIterator())) {
-        } else if (NitroIterator.EACH_MODEL.equals(file.getIterator())) {
+        if (PrimeIterator.ONCE_MODEL.equals(file.getIterator())) {
+        } else if (PrimeIterator.EACH_MODEL.equals(file.getIterator())) {
             ctx.getModels().keySet().stream().parallel().forEach(name -> {
                 try {
-                    NitroGeneratorData finalData = nitroGeneratorData.toBuilder()
-                            .model(NitroGeneratorModelData.of(ctx.getModels().get(name), this.config))
-                            .models(NitroGeneratorModelData.ofList(ctx.getModels().values(), this.config))
-                            .build();
-                    Map<String, Object> templateData = new HashMap<>(finalData.asMap());
-                    processFile(ctx, file, name, templateData, file.getSkippedBy());
+                    NitroGeneratorData templateData = nitroGeneratorData.getCopy();
+                    templateData.setModel(NitroGeneratorModelData.Companion.of(ctx.getModels().get(name), this.config));
+                    templateData.setModels(NitroGeneratorModelData.Companion.ofList(ctx.getModels().values(), this.config));
+                    processFile(ctx, file, name, templateData.asMap(), file.getSkippedBy());
                 } catch (Exception ex) {
                     log.warn("failed to generate file {} [Template: {}]", file.getTargetFileName(), file.getSourceTemplate(), ex);
                 }
             });
-        } else if (NitroIterator.EACH_API_OPERATION.equals(file.getIterator())) {
+        } else if (PrimeIterator.EACH_API_OPERATION.equals(file.getIterator())) {
             ctx.getApiKeys().stream().parallel().forEach(name -> {
-                List<NitroGeneratorOperationData> operations = NitroGeneratorOperationData.ofList(ctx.getApiOperations().get(name), this.config);
+                List<NitroGeneratorOperationData> operations = NitroGeneratorOperationData.Companion.ofList(ctx.getApiOperations().get(name), this.config);
                 operations.stream().parallel().forEach(operation -> {
                     try {
-                        NitroGeneratorData finalData = nitroGeneratorData.toBuilder()
-                                .models(NitroGeneratorModelData.ofList(ctx.getModels().values(), this.config))
-                                .operation(operation)
-                                .operations(operations)
-                                .api(NitroGeneratorApiData.of(ctx.getApiMap().get(name), this.config))
-                                .build();
-                        Map<String, Object> templateData = new HashMap<>(finalData.asMap());
-                        processFile(ctx, file, operation.getClassname(), templateData, file.getSkippedBy());
+                        NitroGeneratorData templateData = nitroGeneratorData.getCopy();
+                        templateData.setModels(NitroGeneratorModelData.Companion.ofList(ctx.getModels().values(), this.config));
+                        templateData.setOperation(operation);
+                        templateData.setOperations(operations);
+                        templateData.setApi(NitroGeneratorApiData.Companion.of(ctx.getApiMap().get(name), this.config));
+                        processFile(ctx, file, operation.getClassname(), templateData.asMap(), file.getSkippedBy());
                     } catch (Exception ex) {
                         log.warn("failed to generate file {} [Template: {}]", file.getTargetFileName(), file.getSourceTemplate(), ex);
                     }
@@ -281,18 +277,16 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
         }
     }
 
-    protected void generateNitroFileApi(GeneratorContext ctx, NitroCodegenFile file, Boolean skipped) throws IOException {
+    protected void generateNitroFileApi(GeneratorContext ctx, PrimeTemplateSpec file, Boolean skipped) throws IOException {
         if (skipped) return;
 
-        if (NitroIterator.ONCE_API.equals(file.getIterator())) {
+        if (PrimeIterator.ONCE_API.equals(file.getIterator())) {
             try {
-                NitroGeneratorData finalData = nitroGeneratorData.toBuilder()
-                        .models(NitroGeneratorModelData.ofList(ctx.getModels().values(), this.config))
-                        .operations(NitroGeneratorOperationData.ofList(ctx.getApiOperations().values().stream().flatMap(Collection::stream).collect(Collectors.toList()), this.config))
-                        .apis(NitroGeneratorApiData.ofList(ctx.getApiMap().values(), this.config))
-                        .build();
-                Map<String, Object> templateData = new HashMap<>(finalData.asMap());
-                processFile(ctx, file, file.getTargetFileName(), templateData, file.getSkippedBy());
+                NitroGeneratorData templateData = nitroGeneratorData.getCopy();
+                templateData.setModels(NitroGeneratorModelData.Companion.ofList(ctx.getModels().values(), this.config));
+                templateData.setOperations(NitroGeneratorOperationData.Companion.ofList(ctx.getApiOperations().values().stream().flatMap(Collection::stream).collect(Collectors.toList()), this.config));
+                templateData.setApis(NitroGeneratorApiData.Companion.ofList(ctx.getApiMap().values(), this.config));
+                processFile(ctx, file, file.getTargetFileName(), templateData.asMap(), file.getSkippedBy());
             } catch (Exception ex) {
                 log.warn("failed to generate file {} [Template: {}]", file.getTargetFileName(), file.getSourceTemplate(), ex);
             }
@@ -300,16 +294,14 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
             // nitroGeneratorData.setModels(NitroGeneratorModelData.ofList(ctx.getModels().values(), this.config));
             // nitroGeneratorData.setOperations(NitroGeneratorOperationData.ofList(ctx.getOperations().values(), this.config));
             // nitroGeneratorData.setApi(NitroGeneratorApiData.of(ctx.getApiOperations(), this.config));
-        } else if (NitroIterator.EACH_API.equals(file.getIterator())) {
+        } else if (PrimeIterator.EACH_API.equals(file.getIterator())) {
             ctx.getApiKeys().stream().parallel().forEach(name -> {
                 try {
-                    NitroGeneratorData finalData = nitroGeneratorData.toBuilder()
-                            .models(NitroGeneratorModelData.ofList(ctx.getModels().values(), this.config))
-                            .operations(NitroGeneratorOperationData.ofList(ctx.getApiOperations().get(name), this.config))
-                            .api(NitroGeneratorApiData.of(ctx.getApiMap().get(name), this.config))
-                            .build();
-                    Map<String, Object> templateData = new HashMap<>(finalData.asMap());
-                    processFile(ctx, file, name, templateData, file.getSkippedBy());
+                    NitroGeneratorData templateData = nitroGeneratorData.getCopy();
+                    templateData.setModels(NitroGeneratorModelData.Companion.ofList(ctx.getModels().values(), this.config));
+                    templateData.setOperations(NitroGeneratorOperationData.Companion.ofList(ctx.getApiOperations().get(name), this.config));
+                    templateData.setApi(NitroGeneratorApiData.Companion.of(ctx.getApiMap().get(name), this.config));
+                    processFile(ctx, file, name, templateData.asMap(), file.getSkippedBy());
                 } catch (Exception ex) {
                     log.warn("failed to generate file {} [Template: {}]", file.getTargetFileName(), file.getSourceTemplate(), ex);
                 }
@@ -319,15 +311,13 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
         }
     }
 
-    protected void generateSupportingFile(GeneratorContext ctx, NitroCodegenFile file, Boolean skipped) throws IOException {
+    protected void generateSupportingFile(GeneratorContext ctx, PrimeTemplateSpec file, Boolean skipped) throws IOException {
         if (skipped) return;
 
         try {
-            NitroGeneratorData finalData = nitroGeneratorData.toBuilder()
-                .models(NitroGeneratorModelData.ofList(ctx.getModels().values(), this.config))
-                .build();
-            Map<String, Object> templateData = new HashMap<>(finalData.asMap());
-            processFile(ctx, file, file.getTargetFileName(), templateData, file.getSkippedBy());
+            NitroGeneratorData templateData = nitroGeneratorData.getCopy();
+            templateData.setModels(NitroGeneratorModelData.Companion.ofList(ctx.getModels().values(), this.config));
+            processFile(ctx, file, file.getTargetFileName(), templateData.asMap(), file.getSkippedBy());
         } catch (Exception ex) {
             log.warn("failed to generate file {} [Template: {}]", file.getTargetFileName(), file.getSourceTemplate(), ex);
         }
@@ -343,7 +333,7 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
      * @param skippedBy the property that needs to be set to skip generation of this file
      * @throws IOException
      */
-    private void processFile(@NotNull GeneratorContext ctx, @NotNull NitroCodegenFile file, @NotNull String name, @NotNull Map<String, Object> templateData, @NotNull String skippedBy) throws IOException {
+    private void processFile(@NotNull GeneratorContext ctx, @NotNull PrimeTemplateSpec file, @NotNull String name, @NotNull Map<String, Object> templateData, @NotNull String skippedBy) throws IOException {
         String filename = file.getTargetDirectory() + File.separator + this.getFilename(file, name);
 
         if (StringUtils.isNotEmpty(file.getSourceTemplate())) {
@@ -352,7 +342,7 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
             File written = this.processTemplateToFile(templateData, file.getSourceTemplate(), filename, nitroGeneratorData.getGenerateModels(), skippedBy);
             if (written != null) {
                 if (this.config.isEnablePostProcessFile() && !nitroGeneratorData.getDryRun()) {
-                    this.config.postProcessFile(written, file.getPostProcessType());
+                    this.config.postProcessFile(written, file.getScope().getPostProcessType());
                 }
 
                 ctx.getFiles().add(written);
@@ -445,20 +435,20 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
      * replaces all placeholders in the filename
      */
     @NotNull
-    protected String getFilename(NitroCodegenFile file, String name) {
+    protected String getFilename(PrimeTemplateSpec file, String name) {
         String fileName = file.getTargetFileName();
 
-        if (NitroScope.MODEL.equals(file.getScope())) {
+        if (TemplateScope.MODEL.equals(file.getScope())) {
             fileName = fileName.replace("{name}", this.config.toModelFilename(name));
-        } else if (NitroScope.MODEL_TEST.equals(file.getScope())) {
+        } else if (TemplateScope.MODEL_TEST.equals(file.getScope())) {
             fileName = fileName.replace("{name}", this.config.toModelTestFilename(name));
-        } else if (NitroScope.MODEL_DOCS.equals(file.getScope())) {
+        } else if (TemplateScope.MODEL_DOCS.equals(file.getScope())) {
             fileName = fileName.replace("{name}", this.config.toModelDocFilename(name));
-        } else if (NitroScope.API.equals(file.getScope())) {
+        } else if (TemplateScope.API.equals(file.getScope())) {
             fileName = fileName.replace("{name}", this.config.toApiFilename(name));
-        } else if (NitroScope.API_TEST.equals(file.getScope())) {
+        } else if (TemplateScope.API_TEST.equals(file.getScope())) {
             fileName = fileName.replace("{name}", this.config.toApiTestFilename(name));
-        } else if (NitroScope.API_DOCS.equals(file.getScope())) {
+        } else if (TemplateScope.API_DOCS.equals(file.getScope())) {
             fileName = fileName.replace("{name}", this.config.toApiDocFilename(name));
         }
         fileName = fileName.replace("{mainClassName}", nitroGeneratorData.getMainClassName());

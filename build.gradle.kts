@@ -6,9 +6,11 @@ plugins {
 allprojects {
     apply(plugin = "java-library")
     apply(plugin = "me.philippheuer.configuration")
+    apply(plugin = "io.freefair.lombok")
 
     projectConfiguration {
         type.set(me.philippheuer.projectcfg.domain.ProjectType.LIBRARY)
+        language.set(me.philippheuer.projectcfg.domain.ProjectLanguage.KOTLIN)
         javaVersion.set(JavaVersion.VERSION_17)
 
         pom = { pom ->

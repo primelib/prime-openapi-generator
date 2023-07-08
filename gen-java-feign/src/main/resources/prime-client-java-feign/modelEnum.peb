@@ -1,27 +1,23 @@
+{# @pebvariable name="model" type="io.github.primelib.primecodegen.core.domain.template.NitroGeneratorModelData" #}
+{# @pebvariable name="cfg" type="io.github.primelib.primecodegen.javafeign.config.JavaFeignGeneratorConfig" #}
 /**
  * {% if model.title is empty %}{{ model.classname }}{{ else }}{{ model.title }}{% endif %}{{ newline() }}
  * {{ model.description }}{{ newline() }}
  *
 {% if model.isDeprecated %} * @deprecated{% if model.vendorExtensions['x-deprecated'] is not empty %} {{ model.vendorExtensions['x-deprecated'] }}{% endif %}{{ newline() }}{% endif %}
  */
-{# Information #}
-{% if model.description is not empty %}@Schema(description = "{{ model.description }}"){{ newline() }}{% endif %}
-@Generated(value = "{{ generatorClass }}"{% if not hideGenerationTimestamp %}, date = "{{ generatedDate }}"{% endif %})
-{# JSON - Jackson #}
+{% if model.codegenModel.vars is not empty %}
 @JsonPropertyOrder({
 {% for var in model.vars %}
     "{{ var.baseName }}"{% if not loop.last %},{% endif %}{{ newline() }}
 {% endfor %}
 })
-@JsonTypeName("{{ model.name }}")
-{# Deprecated #}
-    {% if model.isDeprecated %}@Deprecated{{ newline() }}{% endif %}
-@Data
-public class {{ model.classname }}{% if model.parent is not empty %} extends {{ model.parent }}{% endif %} {
-{% if serializableModel %}
-    private static final long serialVersionUID = 1L;
 {% endif %}
-
+@JsonTypeName("{{ model.name }}")
+@Data
+{% if model.isDeprecated %}@Deprecated{{ newline() }}{% endif %}
+@Generated(value = "{{ generatorClass }}"{% if not hideGenerationTimestamp %}, date = "{{ generatedDate }}"{% endif %})
+public class {{ model.classname }}{% if model.parent is not empty %} extends {{ model.parent }}{% endif %} {
     {% for var in model.vars %}
     @JsonProperty("{{ var.baseName }}")
     private {{ var.datatypeWithEnum }} {{var.name}}{% if var.defaultValue is not empty %} = {{ var.defaultValue }}{% endif %};

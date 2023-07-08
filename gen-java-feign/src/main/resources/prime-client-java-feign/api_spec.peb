@@ -48,8 +48,8 @@ public class {{ t.operation.classname }}Spec {
      */
     {% if param.required %}@NotNull{% else %}@Nullable{% endif %}{{ newline() }}
     private {{ param.dataType }} {{ param.paramName }};
-{% endfor %}
 
+{% endfor %}
     /**
      * Constructs a validated implementation of {@link {{ t.operation.classname }}Spec}.
      *

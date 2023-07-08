@@ -22,11 +22,13 @@ dependencies {
 }
 
 application {
-    mainClass.set("com.github.twitch4j.codegen.cli.Application")
+    mainClass.set("io.github.primelib.primecodegen.cli.Application")
 }
 
 tasks {
     withType<Jar> {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
         if (this is ShadowJar) {
             archiveBaseName.set("openapi-generator")
             archiveClassifier.set("")

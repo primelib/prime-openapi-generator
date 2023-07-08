@@ -10,12 +10,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.annotation.processing.Generated;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-
 import lombok.Data;
 
 {% if t.model.isEnum %}
-{# ENUM's are not supported yet #}
+{% include "./modelEnum.peb" with {"model": t.model} %}
 {% else %}
 {% include "./modelPojo.peb" with {"model": t.model} %}
 {% endif %}

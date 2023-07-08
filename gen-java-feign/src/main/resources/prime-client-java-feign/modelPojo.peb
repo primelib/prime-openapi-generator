@@ -1,32 +1,33 @@
 {# @pebvariable name="model" type="io.github.primelib.primecodegen.core.domain.template.NitroGeneratorModelData" #}
 {# @pebvariable name="cfg" type="io.github.primelib.primecodegen.javafeign.config.JavaFeignGeneratorConfig" #}
 /**
- * {% if model.title is empty %}{{ model.classname }}{{ else }}{{ model.title }}{% endif %}{{ newline() }}
+ * {% if model.title is empty %}{{ model.classname }}{% else %}{{ model.title }}{% endif %}{{ newline() }}
+{% if model.description is not empty %}
+ * <p>
  * {{ model.description }}{{ newline() }}
+{% endif %}
  *
 {% if model.isDeprecated %} * @deprecated{% if model.vendorExtensions['x-deprecated'] is not empty %} {{ model.vendorExtensions['x-deprecated'] }}{% endif %}{{ newline() }}{% endif %}
  */
-{# Information #}
-{% if model.description is not empty %}@Schema(description = "{{ model.description }}"){{ newline() }}{% endif %}
-@Generated(value = "{{ t.generatorClass }}"{% if not cfg.hideGenerationTimestamp %}, date = "{{ t.generatorDate }}"{% endif %})
-{# JSON - Jackson #}
+
+@Data
+{% if model.codegenModel.vars is not empty %}
 @JsonPropertyOrder({
 {% for var in model.codegenModel.vars %}
     "{{ var.baseName }}"{% if not loop.last %},{% endif %}{{ newline() }}
 {% endfor %}
 })
-@JsonTypeName("{{ model.codegenModel.name }}")
-{# Deprecated #}
-{% if model.isDeprecated %}@Deprecated{{ newline() }}{% endif %}
-@Data
-public class {{ model.classname }}{% if model.codegenModel.parent is not empty %} extends {{ model.codegenModel.parent }}{% endif %} {
-{% if serializableModel %}
-    private static final long serialVersionUID = 1L;
 {% endif %}
+@JsonTypeName("{{ model.codegenModel.name }}")
+{% if model.isDeprecated %}@Deprecated{{ newline() }}{% endif %}
+@Generated(value = "{{ t.generatorClass }}"{% if not cfg.hideGenerationTimestamp %}, date = "{{ t.generatorDate }}"{% endif %})
+public class {{ model.classname }}{% if model.codegenModel.parent is not empty %} extends {{ model.codegenModel.parent }}{% endif %} {
 
 {% for var in model.codegenModel.vars %}
 {% if var.description is not empty %}
-    // {{ var.description }}{{ newline() }}
+    /**
+     * {{ var.description }}{{ newline() }}
+     */
 {% endif %}
     @JsonProperty("{{ var.baseName }}")
     private {{ var.datatypeWithEnum }} {{ var.name }}{% if var.defaultValue is not empty %} = {{ var.defaultValue }}{% endif %};

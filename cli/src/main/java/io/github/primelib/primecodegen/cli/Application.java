@@ -1,10 +1,10 @@
 package io.github.primelib.primecodegen.cli;
 
-import io.github.primelib.primecodegen.cli.cmd.NitroGenerateCmd;
 import io.airlift.airline.Cli;
 import io.airlift.airline.ParseArgumentsUnexpectedException;
 import io.airlift.airline.ParseOptionMissingException;
 import io.airlift.airline.ParseOptionMissingValueException;
+import io.github.primelib.primecodegen.cli.cmd.NitroGenerateCmd;
 import org.openapitools.codegen.OpenAPIGenerator;
 import org.openapitools.codegen.cmd.AuthorTemplate;
 import org.openapitools.codegen.cmd.BuildInfo;
