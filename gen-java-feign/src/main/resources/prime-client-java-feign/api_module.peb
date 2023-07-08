@@ -15,7 +15,7 @@ import {{ t.additionalProperties.get("specPackage") }}.{{ operation.nickname | c
 {# Information #}
 {% if description is not empty %}@Schema(description = "{{ description }}"){{ newline() }}{% endif %}
 @Generated(value = "{{ t.generatorClass }}"{% if not cfg.hideGenerationTimestamp %}, date = "{{ t.generatorDate }}"{% endif %})
-public interface {{ t.api.classname }} {
+public interface {{ t.mainClassName }} {
 
 {% for operation in t.api.operations %}
 {# @pebvariable name="operation" type="org.openapitools.codegen.CodegenOperation" #}

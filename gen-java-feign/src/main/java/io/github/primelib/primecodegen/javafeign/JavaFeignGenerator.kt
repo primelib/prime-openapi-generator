@@ -5,8 +5,10 @@ import io.github.primelib.primecodegen.core.api.PrimeCodegenConfig
 import io.github.primelib.primecodegen.core.domain.config.PrimeIterator
 import io.github.primelib.primecodegen.core.domain.config.PrimeTemplateSpec
 import io.github.primelib.primecodegen.core.domain.config.TemplateScope
+import io.github.primelib.primecodegen.core.extensions.pruneOperationTags
 import io.github.primelib.primecodegen.core.generator.ExtendableJavaCodegenBase
 import io.github.primelib.primecodegen.javafeign.config.JavaFeignGeneratorConfig
+import io.swagger.v3.oas.models.OpenAPI
 import org.openapitools.codegen.CodegenConfig
 import org.openapitools.codegen.CodegenType
 
@@ -35,6 +37,13 @@ class JavaFeignGenerator : ExtendableJavaCodegenBase(), CodegenConfig, PrimeCode
      */
     init {
         templateDir = CODEGEN_NAME
+    }
+
+    override fun preprocessOpenAPI(openAPI: OpenAPI) {
+        super.preprocessOpenAPI(openAPI)
+
+        // truncate tags to merge all operations into one feign interface
+        openAPI.pruneOperationTags()
     }
 
     override fun processOpts() {
@@ -71,35 +80,11 @@ class JavaFeignGenerator : ExtendableJavaCodegenBase(), CodegenConfig, PrimeCode
             iterator = PrimeIterator.ONCE_API,
         ))
         cfg.templateSpecs.add(PrimeTemplateSpec(
-            description = "the main api class, containing all api operations",
-            sourceTemplate = "api_main.peb",
-            targetDirectory = apiFolder,
-            targetFileName = "{mainClassName}.java",
-            scope = TemplateScope.API,
-            iterator = PrimeIterator.ONCE_API,
-        ))
-        cfg.templateSpecs.add(PrimeTemplateSpec(
-            description = "a collection of all api classes",
-            sourceTemplate = "api_collect.peb",
-            targetDirectory = apiFolder,
-            targetFileName = "{mainClassName}ApiCollection.java",
-            scope = TemplateScope.API,
-            iterator = PrimeIterator.ONCE_API,
-        ))
-        cfg.templateSpecs.add(PrimeTemplateSpec(
             description = "a module class containing all api operations for a single path",
             sourceTemplate = "api_module.peb",
             targetDirectory = apiFolder,
-            targetFileName = "{name}.java",
+            targetFileName = "{mainClassName}.java",
             scope = TemplateScope.API,
-            iterator = PrimeIterator.EACH_API,
-        ))
-        cfg.templateSpecs.add(PrimeTemplateSpec(
-            description = "a module test class containing all api operations for a single path",
-            sourceTemplate = "api_module_test.peb",
-            targetDirectory = apiTestFileFolder(),
-            targetFileName = "{name}.java",
-            scope = TemplateScope.API_TEST,
             iterator = PrimeIterator.EACH_API,
         ))
 
@@ -113,9 +98,9 @@ class JavaFeignGenerator : ExtendableJavaCodegenBase(), CodegenConfig, PrimeCode
             iterator = PrimeIterator.EACH_MODEL,
         ))
         cfg.templateSpecs.add(PrimeTemplateSpec(
-            description = "a spec equivalent to the model class",
+            description = "a model class representing a single api response",
             sourceTemplate = "api_spec.peb",
-            targetDirectory = modelTestFileFolder(),
+            targetDirectory = specFolder,
             targetFileName = "{name}Spec.java",
             scope = TemplateScope.MODEL,
             iterator = PrimeIterator.EACH_API_OPERATION,

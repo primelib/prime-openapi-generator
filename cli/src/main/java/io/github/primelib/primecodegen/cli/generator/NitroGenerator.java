@@ -385,7 +385,6 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
             nitroGeneratorData.setMainClassName(camelize("default", CamelizeOption.UPPERCASE_FIRST_CHAR));
         }
         this.config.additionalProperties().put("mainClassName", nitroGeneratorData.getMainClassName());
-
         nitroGeneratorData.setAdditionalProperties(this.config.additionalProperties());
 
         // debugging

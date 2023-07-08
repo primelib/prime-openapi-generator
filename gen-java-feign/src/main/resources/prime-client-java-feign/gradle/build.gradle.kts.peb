@@ -12,7 +12,7 @@ projectConfiguration {
 
 dependencies {
     // bom
-    api(platform("io.github.openfeign:feign-bom:12.3"))
+    api(platform("io.github.openfeign:feign-bom:12.4"))
 
     // annotations
     implementation("org.jetbrains:annotations:24.0.1")
