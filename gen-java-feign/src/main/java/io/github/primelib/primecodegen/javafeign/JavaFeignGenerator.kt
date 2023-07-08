@@ -123,12 +123,6 @@ class JavaFeignGenerator : ExtendableJavaCodegenBase(), CodegenConfig, PrimeCode
 
         // supporting files
         cfg.templateSpecs.add(PrimeTemplateSpec(
-            sourceTemplate = "gitignore.peb",
-            targetDirectory = outputFolder,
-            targetFileName = ".gitignore",
-            scope = TemplateScope.SUPPORT,
-        ))
-        cfg.templateSpecs.add(PrimeTemplateSpec(
             sourceTemplate = "gradle/build.gradle.kts.peb",
             targetDirectory = outputFolder,
             targetFileName = "build.gradle.kts",
@@ -162,7 +156,13 @@ class JavaFeignGenerator : ExtendableJavaCodegenBase(), CodegenConfig, PrimeCode
             overwrite = false,
         ))
         cfg.templateSpecs.add(PrimeTemplateSpec(
-            sourceTemplate = "renovate.json.peb",
+            sourceTemplate = "support/gitignore.peb",
+            targetDirectory = outputFolder,
+            targetFileName = ".gitignore",
+            scope = TemplateScope.SUPPORT,
+        ))
+        cfg.templateSpecs.add(PrimeTemplateSpec(
+            sourceTemplate = "support/renovate.json.peb",
             targetDirectory = outputFolder,
             targetFileName = "renovate.json",
             scope = TemplateScope.SUPPORT,
