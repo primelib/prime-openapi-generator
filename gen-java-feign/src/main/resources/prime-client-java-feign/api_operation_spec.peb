@@ -18,45 +18,28 @@ import org.jetbrains.annotations.Nullable;
  * Specification for the {{ t.operation.classname }} operation.
  * <p>
  * {{ t.operation.codegenOperation.summary }}{{ newline() }}
- *
-{% if t.operation.codegenOperation.allParams is not empty %}
- * Required Parameters:
-{% for param in t.operation.codegenOperation.allParams %}
-{% if param.required %}
- * - {{ param.paramName }} {{ param.description }}{{ newline() }}
-{% endif %}
-{% endfor %}
- * Optional Parameters:
-{% for param in t.operation.codegenOperation.allParams %}
-{% if not param.required %}
- * - {{ param.paramName }} {{ param.description }}{{ newline() }}
-{% endif %}
-{% endfor %}
-{% endif %}
  */
-{# Information #}
-{% if description is not empty %}@Schema(description = "{{ description }}"){{ newline() }}{% endif %}
 @Data
 @Accessors(fluent = true)
 @NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
 @Generated(value = "{{ t.generatorClass }}"{% if not cfg.hideGenerationTimestamp %}, date = "{{ t.generatorDate }}"{% endif %})
-public class {{ t.operation.classname }}Spec {
+public class {{ t.operation.classname }}OperationSpec {
 
 {% for param in t.operation.codegenOperation.allParams %}
     /**
-     * {{ param.description }}{{ newline() }}
+{{ javadocDescription("     * ", param.description) }}
      */
-    {% if param.required %}@NotNull{% else %}@Nullable{% endif %}{{ newline() }}
+    {% include "./param_annotation.peb" %}{{ newline() }}
     private {{ param.dataType }} {{ param.paramName }};
-
+{{ newline() }}
 {% endfor %}
     /**
-     * Constructs a validated implementation of {@link {{ t.operation.classname }}Spec}.
+     * Constructs a validated implementation of {@link {{ t.operation.classname }}OperationSpec}.
      *
      * @param spec the specification to process
      */
     @ApiStatus.Internal
-    public {{ t.operation.classname }}Spec(Consumer<{{ t.operation.classname }}Spec> spec) {
+    public {{ t.operation.classname }}OperationSpec(Consumer<{{ t.operation.classname }}OperationSpec> spec) {
         spec.accept(this);
         validate();
     }

@@ -81,9 +81,17 @@ class JavaFeignGenerator : ExtendableJavaCodegenBase(), CodegenConfig, PrimeCode
         ))
         cfg.templateSpecs.add(PrimeTemplateSpec(
             description = "a module class containing all api operations for a single path",
-            sourceTemplate = "api_module.peb",
+            sourceTemplate = "api_main.peb",
             targetDirectory = apiFolder,
-            targetFileName = "{mainClassName}.java",
+            targetFileName = "{mainClassName}Api.java",
+            scope = TemplateScope.API,
+            iterator = PrimeIterator.EACH_API,
+        ))
+        cfg.templateSpecs.add(PrimeTemplateSpec(
+            description = "a class that allows calling methods using the request spec's, requests are forwarded to the main feign interface",
+            sourceTemplate = "api_mainspec.peb",
+            targetDirectory = apiFolder,
+            targetFileName = "{mainClassName}SpecApi.java",
             scope = TemplateScope.API,
             iterator = PrimeIterator.EACH_API,
         ))
@@ -99,9 +107,9 @@ class JavaFeignGenerator : ExtendableJavaCodegenBase(), CodegenConfig, PrimeCode
         ))
         cfg.templateSpecs.add(PrimeTemplateSpec(
             description = "a model class representing a single api response",
-            sourceTemplate = "api_spec.peb",
+            sourceTemplate = "api_operation_spec.peb",
             targetDirectory = specFolder,
-            targetFileName = "{name}Spec.java",
+            targetFileName = "{name}OperationSpec.java",
             scope = TemplateScope.MODEL,
             iterator = PrimeIterator.EACH_API_OPERATION,
         ))

@@ -4,7 +4,7 @@
 package {{ t.additionalProperties.get("invokerPackage") }};
 
 {% include "./import.peb" with {"t": t, "imports": t.api.imports} %}
-import {{ t.apiPackage }}.{{ t.mainClassName }};
+import {{ t.apiPackage }}.{{ t.mainClassName }}Api;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -44,20 +44,20 @@ public class {{ t.mainClassName }}Factory {
             return buildClient(spec);
         } else {
             try {
-                {{ t.mainClassName }} api = buildClient(s -> {
-                    s.api({{ t.mainClassName }}.class);
+                {{ t.mainClassName }}Api api = buildClient(s -> {
+                    s.api({{ t.mainClassName }}Api.class);
                     s.backendName(config.backendName());
                     s.baseUrl(config.baseUrl());
                 });
-                return config.api().getConstructor({{ t.mainClassName }}.class).newInstance(api);
+                return config.api().getConstructor({{ t.mainClassName }}Api.class).newInstance(api);
             } catch (Exception e) {
                 throw new IllegalArgumentException("api must have a constructor with one parameter of type PerspectiveApi");
             }
         }
     }
 
-    public static {{ t.mainClassName }} build() {
-        return build(spec -> spec.api({{ t.mainClassName }}.class));
+    public static {{ t.mainClassName }}Api build() {
+        return build(spec -> spec.api({{ t.mainClassName }}Api.class));
     }
 
     private static <T> T buildClient(Consumer<{{ t.mainClassName }}FactorySpec<T>> spec) {

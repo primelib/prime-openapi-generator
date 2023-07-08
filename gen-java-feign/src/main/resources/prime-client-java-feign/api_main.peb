@@ -1,0 +1,33 @@
+{# @pebvariable name="t" type="io.github.primelib.primecodegen.core.domain.template.NitroGeneratorData" #}
+{# @pebvariable name="cfg" type="io.github.primelib.primecodegen.javafeign.config.JavaFeignGeneratorConfig" #}
+{% include "./licenseInfo.peb" %}
+package {{ t.apiPackage }};
+
+{% include "./import.peb" with {"t": t, "imports": t.api.imports} %}
+import feign.*;
+
+{# Information #}
+{% if description is not empty %}@Schema(description = "{{ description }}"){{ newline() }}{% endif %}
+@Generated(value = "{{ t.generatorClass }}"{% if not cfg.hideGenerationTimestamp %}, date = "{{ t.generatorDate }}"{% endif %})
+public interface {{ t.mainClassName }}Api {
+
+{% for operation in t.api.operations %}
+{# @pebvariable name="operation" type="org.openapitools.codegen.CodegenOperation" #}
+{% include "./javadoc_method.peb" %}{{ newline() }}
+{# Deprecated #}
+{% if operation.isDeprecated %}
+    @Deprecated{{ newline() }}
+{% endif %}
+{# Feign Annotations #}
+    @RequestLine("{{ operation.httpMethod }} {{ operation.path }}{% if operation.hasQueryParams %}?{% for param in operation.queryParams %}{{ param.baseName }}={{ "{" }}{{ param.paramName }}{{ "}" }}{% if not loop.last %}&{% endif %}{% endfor %}{% endif %}")
+{% if operation.hasHeaderParams %}
+    @Headers(
+{% for param in operation.headerParams %}
+        "{{ param.baseName }}: {% if param.baseName == "Authorization" %}Bearer {% endif %}{{ param.paramName | wrapin("{", "}") }}"{% if not loop.last %}, {% endif %}{{ newline() }}
+{% endfor %}
+    )
+{% endif %}
+    {% if operation.returnType is not empty %}{{ operation.returnType }}{% else %}void{% endif %} {{ operation.nickname }}({% for param in operation.allParams %}{% if param.isHeaderParam or param.isPathParam or param.isQueryParam %}@Param("{{ param.baseName }}"){% endif %} {% include "./param_annotation.peb" %}{{ param.dataType }} {{ param.paramName }}{% if not loop.last %}, {% endif %}{% endfor %});
+
+{% endfor %}
+}

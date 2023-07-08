@@ -1,1 +1,1 @@
-@param {{ param.paramName | padright(20) }} {{ param.description }}{% if param.required %} (required){% else %} (optional{% if param.defaultValue is not empty %}, defaults to {{ param.defaultValue }}{% endif %}){% endif %}{{ newline() }}
+@param {{ param.paramName | padright(20) }} {{ javadocParamDescription(param.description) }}{% if param.required %} (required){% else %} (optional{% if param.defaultValue is not empty %}, defaults to {{ param.defaultValue }}{% endif %}){% endif %}{{ newline() }}

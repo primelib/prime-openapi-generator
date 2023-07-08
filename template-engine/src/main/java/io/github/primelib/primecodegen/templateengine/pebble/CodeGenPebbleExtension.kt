@@ -4,6 +4,8 @@ import io.github.primelib.primecodegen.templateengine.pebble.filter.LinePrefixFi
 import io.github.primelib.primecodegen.templateengine.pebble.filter.PadRightFilter;
 import io.github.primelib.primecodegen.templateengine.pebble.filter.WrapInFilter;
 import io.github.primelib.primecodegen.templateengine.pebble.function.GetOrDefaultFunction;
+import io.github.primelib.primecodegen.templateengine.pebble.function.JavadocDescription
+import io.github.primelib.primecodegen.templateengine.pebble.function.JavadocParamDescription
 import io.github.primelib.primecodegen.templateengine.pebble.function.NewLineFunction;
 import io.github.primelib.primecodegen.templateengine.pebble.operator.StartsWithOperator;
 import io.pebbletemplates.pebble.attributes.AttributeResolver;
@@ -32,7 +34,9 @@ class CodeGenPebbleExtension : Extension {
     override fun getFunctions(): Map<String, Function> {
         return mapOf(
             "newline" to NewLineFunction(),
-            "getOrDefault" to GetOrDefaultFunction()
+            "getOrDefault" to GetOrDefaultFunction(),
+            "javadocParamDescription" to JavadocParamDescription(),
+            "javadocDescription" to JavadocDescription(),
         )
     }
 

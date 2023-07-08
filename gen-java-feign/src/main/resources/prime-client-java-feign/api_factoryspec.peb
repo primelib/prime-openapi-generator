@@ -4,7 +4,7 @@
 package {{ t.additionalProperties.get("invokerPackage") }};
 
 {% include "./import.peb" with {"t": t, "imports": t.api.imports} %}
-import {{ t.apiPackage }}.{{ t.mainClassName }};
+import {{ t.apiPackage }}.{{ t.mainClassName }}Api;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,7 +14,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
- * A specification to construct a {@link {{ t.mainClassName }}} instance.
+ * A specification to construct a {@link {{ t.mainClassName }}Api} instance.
  */
 {# Information #}
 @Data
@@ -42,7 +42,7 @@ public final class {{ t.mainClassName }}FactorySpec<T> {
     private String baseUrl = "{{ t.basePath }}";
 
     /**
-     * Constructs a validated implementation of {@link {{ t.mainClassName }}}.
+     * Constructs a validated implementation of {@link {{ t.mainClassName }}Api}.
      *
      * @param spec the specification to process
      */
