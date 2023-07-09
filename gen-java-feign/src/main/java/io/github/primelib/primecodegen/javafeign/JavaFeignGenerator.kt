@@ -2,9 +2,10 @@ package io.github.primelib.primecodegen.javafeign;
 
 import io.github.primelib.primecodegen.core.api.PrimeCodegenBase
 import io.github.primelib.primecodegen.core.api.PrimeCodegenConfig
-import io.github.primelib.primecodegen.core.domain.config.PrimeIterator
 import io.github.primelib.primecodegen.core.domain.config.PrimeTemplateSpec
+import io.github.primelib.primecodegen.core.domain.config.TemplateIterator
 import io.github.primelib.primecodegen.core.domain.config.TemplateScope
+import io.github.primelib.primecodegen.core.domain.template.NitroGeneratorImport
 import io.github.primelib.primecodegen.core.extensions.pruneOperationTags
 import io.github.primelib.primecodegen.core.generator.ExtendableJavaCodegenBase
 import io.github.primelib.primecodegen.javafeign.config.JavaFeignGeneratorConfig
@@ -62,14 +63,14 @@ class JavaFeignGenerator : ExtendableJavaCodegenBase(), CodegenConfig, PrimeCode
         // ensure directories exist
         createOutputDirectories(listOf(invokerFolder, apiFolder, modelFolder, specFolder))
 
-        // api files
+        // factory
         cfg.templateSpecs.add(PrimeTemplateSpec(
             description = "a global factory class to instantiate all api classes",
             sourceTemplate = "api_factory.peb",
             targetDirectory = invokerFolder,
             targetFileName = "{mainClassName}Factory.java",
             scope = TemplateScope.API,
-            iterator = PrimeIterator.ONCE_API,
+            iterator = TemplateIterator.ONCE_API,
         ))
         cfg.templateSpecs.add(PrimeTemplateSpec(
             description = "a configuration spec that can be passed to the factory, customizing the api client",
@@ -77,23 +78,81 @@ class JavaFeignGenerator : ExtendableJavaCodegenBase(), CodegenConfig, PrimeCode
             targetDirectory = invokerFolder,
             targetFileName = "{mainClassName}FactorySpec.java",
             scope = TemplateScope.API,
-            iterator = PrimeIterator.ONCE_API,
+            iterator = TemplateIterator.ONCE_API,
         ))
+
+        // api
         cfg.templateSpecs.add(PrimeTemplateSpec(
-            description = "a module class containing all api operations for a single path",
+            description = "primary api interface",
             sourceTemplate = "api_main.peb",
             targetDirectory = apiFolder,
             targetFileName = "{mainClassName}Api.java",
             scope = TemplateScope.API,
-            iterator = PrimeIterator.EACH_API,
+            iterator = TemplateIterator.EACH_API,
         ))
         cfg.templateSpecs.add(PrimeTemplateSpec(
-            description = "a class that allows calling methods using the request spec's, requests are forwarded to the main feign interface",
+            description = "spec variant of the primary api interface",
             sourceTemplate = "api_mainspec.peb",
             targetDirectory = apiFolder,
             targetFileName = "{mainClassName}SpecApi.java",
             scope = TemplateScope.API,
-            iterator = PrimeIterator.EACH_API,
+            iterator = TemplateIterator.EACH_API,
+        ))
+
+        // rxjava api
+        cfg.templateSpecs.add(PrimeTemplateSpec(
+            description = "api interface for rxjava",
+            sourceTemplate = "api_main.peb",
+            targetDirectory = apiFolder,
+            targetFileName = "{mainClassName}RxJavaApi.java",
+            scope = TemplateScope.API,
+            iterator = TemplateIterator.EACH_API,
+            transform = { data ->
+                data.mainClassName = "${data.mainClassName}RxJava"
+                data.additionalProperties["primeWrapReturnType"] = "Flowable<%s>"
+                data.api?.imports?.add(NitroGeneratorImport("io.reactivex.Flowable"))
+            }
+        ))
+        cfg.templateSpecs.add(PrimeTemplateSpec(
+            description = "spec variant of the primary api interface",
+            sourceTemplate = "api_mainspec.peb",
+            targetDirectory = apiFolder,
+            targetFileName = "{mainClassName}RxJavaSpecApi.java",
+            scope = TemplateScope.API,
+            iterator = TemplateIterator.EACH_API,
+            transform = { data ->
+                data.mainClassName = "${data.mainClassName}RxJava"
+                data.additionalProperties["primeWrapReturnType"] = "Flowable<%s>"
+                data.api?.imports?.add(NitroGeneratorImport("io.reactivex.Flowable"))
+            }
+        ))
+
+        // reactor api
+        cfg.templateSpecs.add(PrimeTemplateSpec(
+            description = "api interface for reactor",
+            sourceTemplate = "api_main.peb",
+            targetDirectory = apiFolder,
+            targetFileName = "{mainClassName}ReactorApi.java",
+            scope = TemplateScope.API,
+            iterator = TemplateIterator.EACH_API,
+            transform = { data ->
+                data.mainClassName = "${data.mainClassName}Reactor"
+                data.additionalProperties["primeWrapReturnType"] = "Mono<%s>"
+                data.api?.imports?.addAll(listOf(NitroGeneratorImport("reactor.core.publisher.Mono"), NitroGeneratorImport("reactor.core.publisher.Flux")))
+            }
+        ))
+        cfg.templateSpecs.add(PrimeTemplateSpec(
+            description = "spec variant of the primary api interface",
+            sourceTemplate = "api_mainspec.peb",
+            targetDirectory = apiFolder,
+            targetFileName = "{mainClassName}ReactorSpecApi.java",
+            scope = TemplateScope.API,
+            iterator = TemplateIterator.EACH_API,
+            transform = { data ->
+                data.mainClassName = "${data.mainClassName}Reactor"
+                data.additionalProperties["primeWrapReturnType"] = "Mono<%s>"
+                data.api?.imports?.addAll(listOf(NitroGeneratorImport("reactor.core.publisher.Mono"), NitroGeneratorImport("reactor.core.publisher.Flux")))
+            }
         ))
 
         // model files
@@ -103,7 +162,7 @@ class JavaFeignGenerator : ExtendableJavaCodegenBase(), CodegenConfig, PrimeCode
             targetDirectory = modelFolder,
             targetFileName = "{name}.java",
             scope = TemplateScope.MODEL,
-            iterator = PrimeIterator.EACH_MODEL,
+            iterator = TemplateIterator.EACH_MODEL,
         ))
         cfg.templateSpecs.add(PrimeTemplateSpec(
             description = "a model class representing a single api response",
@@ -111,7 +170,7 @@ class JavaFeignGenerator : ExtendableJavaCodegenBase(), CodegenConfig, PrimeCode
             targetDirectory = specFolder,
             targetFileName = "{name}OperationSpec.java",
             scope = TemplateScope.MODEL,
-            iterator = PrimeIterator.EACH_API_OPERATION,
+            iterator = TemplateIterator.EACH_API_OPERATION,
         ))
 
         // supporting files

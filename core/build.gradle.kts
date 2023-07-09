@@ -11,6 +11,6 @@ projectConfiguration {
 }
 
 dependencies {
-	// OpenAPI Generator
+	// generator
 	api("org.openapitools:openapi-generator")
 }

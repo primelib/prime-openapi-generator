@@ -1,6 +1,6 @@
 package io.github.primelib.primecodegen.core.domain.config;
 
-enum class PrimeIterator {
+enum class TemplateIterator {
     ONCE_API,
     EACH_API,
     EACH_API_OPERATION,

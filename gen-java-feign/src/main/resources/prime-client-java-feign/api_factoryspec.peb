@@ -75,4 +75,9 @@ public final class {{ t.mainClassName }}FactorySpec<T> {
         }
     }
 
+    public void applySpec({{ t.mainClassName }}FactorySpec<?> spec) {
+        backendName(spec.backendName());
+        baseUrl(spec.baseUrl());
+        meterRegistry(spec.meterRegistry());
+    }
 }

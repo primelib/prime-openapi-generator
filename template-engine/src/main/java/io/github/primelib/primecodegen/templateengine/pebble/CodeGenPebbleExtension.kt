@@ -2,6 +2,7 @@ package io.github.primelib.primecodegen.templateengine.pebble;
 
 import io.github.primelib.primecodegen.templateengine.pebble.filter.LinePrefixFilter;
 import io.github.primelib.primecodegen.templateengine.pebble.filter.PadRightFilter;
+import io.github.primelib.primecodegen.templateengine.pebble.filter.StringFormatFilter
 import io.github.primelib.primecodegen.templateengine.pebble.filter.WrapInFilter;
 import io.github.primelib.primecodegen.templateengine.pebble.function.GetOrDefaultFunction;
 import io.github.primelib.primecodegen.templateengine.pebble.function.JavadocDescription
@@ -23,7 +24,8 @@ class CodeGenPebbleExtension : Extension {
         return mapOf(
             "padright" to PadRightFilter(),
             "wrapin" to WrapInFilter(),
-            "lineprefix" to LinePrefixFilter()
+            "lineprefix" to LinePrefixFilter(),
+            "formatString" to StringFormatFilter(),
         )
     }
 

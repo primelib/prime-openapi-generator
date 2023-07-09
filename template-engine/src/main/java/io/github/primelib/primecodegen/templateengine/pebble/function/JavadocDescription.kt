@@ -17,13 +17,13 @@ class JavadocDescription : Function {
         lineNumber: Int
     ): Any? {
         val left = args["left"] as String
-        val summary = args["summary"] as String
+        val summary = args["summary"] as? String
 
         if (StringUtils.isEmpty(summary)) {
             return ""
         }
 
-        val lines = summary.split("\\s{2}".toRegex())
+        val lines = summary!!.split("\\s{2}".toRegex())
         return StringBuilder().apply {
             lines.map {
                 line -> line.replace("```", "\"")

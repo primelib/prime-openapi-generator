@@ -1,5 +1,7 @@
 package io.github.primelib.primecodegen.core.domain.config;
 
+import io.github.primelib.primecodegen.core.domain.template.NitroGeneratorData
+
 data class PrimeTemplateSpec(
     /**
      * description of the template, used for documentation purposes
@@ -9,18 +11,17 @@ data class PrimeTemplateSpec(
     val targetDirectory: String,
     val targetFileName: String,
     val scope: TemplateScope,
-    val iterator: PrimeIterator = PrimeIterator.ONCE_API,
-    val overwrite: Boolean = false
+    val iterator: TemplateIterator = TemplateIterator.ONCE_API,
+    val overwrite: Boolean = false,
+    /**
+     * filter is used to skip file generation for certain templates
+     */
+    val filter: (NitroGeneratorData) -> Boolean = { true },
+    /**
+     * transform is used to modify the data before it is passed to the template engine
+     */
+    val transform: (NitroGeneratorData) -> Unit = { },
 ) {
-    init {
-        requireNotNull(sourceTemplate) { "sourceTemplate is marked non-null but is null" }
-        requireNotNull(targetDirectory) { "targetDirectory is marked non-null but is null" }
-        requireNotNull(targetFileName) { "targetFileName is marked non-null but is null" }
-        requireNotNull(scope) { "scope is marked non-null but is null" }
-        requireNotNull(iterator) { "iterator is marked non-null but is null" }
-        requireNotNull(overwrite) { "overwrite is marked non-null but is null" }
-    }
-
     /**
      * returns a category key, used to check of file generation should be skipped for this template
      */

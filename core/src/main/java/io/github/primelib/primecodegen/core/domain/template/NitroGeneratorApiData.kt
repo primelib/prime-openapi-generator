@@ -7,8 +7,8 @@ import org.openapitools.codegen.CodegenOperation
 data class NitroGeneratorApiData(
     val packageName: String,
     val classname: String,
-    val imports: List<NitroGeneratorImport>,
-    val operations: List<CodegenOperation>
+    val imports: MutableList<NitroGeneratorImport>,
+    val operations: MutableList<CodegenOperation>
 ) {
     companion object {
         fun of(api: MutableMap<String, Any>, config: CodegenConfig): NitroGeneratorApiData {

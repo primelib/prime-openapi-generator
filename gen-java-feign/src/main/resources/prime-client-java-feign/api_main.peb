@@ -5,9 +5,10 @@ package {{ t.apiPackage }};
 
 {% include "./import.peb" with {"t": t, "imports": t.api.imports} %}
 import feign.*;
+import reactor.core.publisher.Mono;
+import reactor.core.publisher.Flux;
+import io.reactivex.Flowable;
 
-{# Information #}
-{% if description is not empty %}@Schema(description = "{{ description }}"){{ newline() }}{% endif %}
 @Generated(value = "{{ t.generatorClass }}"{% if not cfg.hideGenerationTimestamp %}, date = "{{ t.generatorDate }}"{% endif %})
 public interface {{ t.mainClassName }}Api {
 
@@ -27,7 +28,7 @@ public interface {{ t.mainClassName }}Api {
 {% endfor %}
     )
 {% endif %}
-    {% if operation.returnType is not empty %}{{ operation.returnType }}{% else %}void{% endif %} {{ operation.nickname }}({% for param in operation.allParams %}{% if param.isHeaderParam or param.isPathParam or param.isQueryParam %}@Param("{{ param.baseName }}"){% endif %} {% include "./param_annotation.peb" %}{{ param.dataType }} {{ param.paramName }}{% if not loop.last %}, {% endif %}{% endfor %});
+    {% if operation.returnType is not empty %}{{ operation.returnType | formatString(t.additionalProperties.getOrDefault("primeWrapReturnType", "%s")) }}{% else %}void{% endif %} {{ operation.nickname }}({% for param in operation.allParams %}{% if param.isHeaderParam or param.isPathParam or param.isQueryParam %}@Param("{{ param.baseName }}"){% endif %} {% include "./param_annotation.peb" %}{{ param.dataType }} {{ param.paramName }}{% if not loop.last %}, {% endif %}{% endfor %});
 
 {% endfor %}
 }

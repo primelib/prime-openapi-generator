@@ -39,6 +39,8 @@ import reactor.core.publisher.Mono;
 
 import java.lang.reflect.Method;
 
+import java.util.function.Consumer;
+
 {# Information #}
 @NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
 @Slf4j
@@ -56,15 +58,37 @@ public class {{ t.mainClassName }}Factory {
         if (config.api().isInterface()) {
             return buildClient(spec);
         } else {
-            try {
-                {{ t.mainClassName }}Api api = buildClient(s -> {
-                    s.api({{ t.mainClassName }}Api.class);
-                    s.backendName(config.backendName());
-                    s.baseUrl(config.baseUrl());
-                });
-                return config.api().getConstructor({{ t.mainClassName }}Api.class).newInstance(api);
-            } catch (Exception e) {
-                throw new IllegalArgumentException("api must have a constructor with one parameter of type PerspectiveApi");
+            switch (detectVariant(config.api())) {
+                case "reactor":
+                    try {
+                        {{ t.mainClassName }}ReactorApi api = buildClient(s -> {
+                            s.api({{ t.mainClassName }}ReactorApi.class);
+                            s.applySpec(config);
+                        });
+                        return config.api().getConstructor({{ t.mainClassName }}ReactorApi.class).newInstance(api);
+                    } catch (Exception e) {
+                        throw new IllegalArgumentException("api must have a constructor with one parameter of type {{ t.mainClassName }}ReactorApi");
+                    }
+                case "rxjava":
+                    try {
+                        {{ t.mainClassName }}RxJavaApi api = buildClient(s -> {
+                            s.api({{ t.mainClassName }}RxJavaApi.class);
+                            s.applySpec(config);
+                        });
+                        return config.api().getConstructor({{ t.mainClassName }}RxJavaApi.class).newInstance(api);
+                    } catch (Exception e) {
+                        throw new IllegalArgumentException("api must have a constructor with one parameter of type {{ t.mainClassName }}RxJavaApi");
+                    }
+                default:
+                    try {
+                        {{ t.mainClassName }}Api api = buildClient(s -> {
+                            s.api({{ t.mainClassName }}Api.class);
+                            s.applySpec(config);
+                        });
+                        return config.api().getConstructor({{ t.mainClassName }}Api.class).newInstance(api);
+                    } catch (Exception e) {
+                        throw new IllegalArgumentException("api must have a constructor with one parameter of type {{ t.mainClassName }}Api");
+                    }
             }
         }
     }
@@ -95,7 +119,7 @@ public class {{ t.mainClassName }}Factory {
                 // decorators
                 FeignDecorators decorators = FeignDecorators.builder()
                         .withBulkhead(bulkheadRegistry.bulkhead(config.backendName()))
-                        .withRateLimiter(rateLimiterRegistry.rateLimiter(config.backendName(), RateLimiterConfig.custom().limitForPeriod(1).limitRefreshPeriod(Duration.ofMinutes(5)).build()))
+                        .withRateLimiter(rateLimiterRegistry.rateLimiter(config.backendName()))
                         .withCircuitBreaker(circuitBreakerRegistry.circuitBreaker(config.backendName()))
                         .withRetry(retryRegistry.retry(config.backendName()))
                         .build();

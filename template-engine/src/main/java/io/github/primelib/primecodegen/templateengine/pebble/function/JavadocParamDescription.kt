@@ -16,12 +16,12 @@ class JavadocParamDescription : Function {
         context: EvaluationContext,
         lineNumber: Int
     ): Any? {
-        val summary = args["summary"] as String
+        val summary = args["summary"] as? String
         if (StringUtils.isEmpty(summary)) {
             return ""
         }
 
-        return summary.replace("```", "\"")
+        return summary!!.replace("```", "\"")
             .replace("\\\"", "\"")
             .replace("<", "{")
             .replace(">", "}")

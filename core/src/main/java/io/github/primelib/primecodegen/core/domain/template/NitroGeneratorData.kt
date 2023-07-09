@@ -2,9 +2,6 @@ package io.github.primelib.primecodegen.core.domain.template;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.core.type.TypeReference
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.SerializationFeature
 import io.github.primelib.primecodegen.core.api.PrimeCodegenConfig
 import io.swagger.v3.oas.models.OpenAPI
 
@@ -70,32 +67,77 @@ data class NitroGeneratorData(
     var licenseName: String? = null,
     var termsOfService: String? = null,
 
+    /**
+     * OpenAPI - Processed Data
+     */
     var model: NitroGeneratorModelData? = null,
-
     var models: MutableList<NitroGeneratorModelData> = mutableListOf(),
-
     var operation: NitroGeneratorOperationData? = null,
-
     var operations: MutableList<NitroGeneratorOperationData> = mutableListOf(),
-
     var api: NitroGeneratorApiData? = null,
-
     var apis: MutableList<NitroGeneratorApiData> = mutableListOf(),
 ) {
-    companion object {
-        val OBJECT_MAPPER: ObjectMapper = ObjectMapper().disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
-    }
-
     @JsonIgnore
-    fun asMap(): MutableMap<String, Any> {
-        return OBJECT_MAPPER.convertValue(this, object : TypeReference<HashMap<String, Any>>() {})
+    fun asMap(): MutableMap<String, Any?> {
+        return mutableMapOf(
+            "dryRun" to dryRun,
+            "openAPI" to openAPI,
+            "debugOpenAPI" to debugOpenAPI,
+            "generateApis" to generateApis,
+            "generateApiTests" to generateApiTests,
+            "generateApiDocumentation" to generateApiDocumentation,
+            "generateModels" to generateModels,
+            "generateModelTests" to generateModelTests,
+            "generateModelDocumentation" to generateModelDocumentation,
+            "generateSupportingFiles" to generateSupportingFiles,
+            "generateSkipFormModel" to generateSkipFormModel,
+            "generateMetadata" to generateMetadata,
+            "config" to config,
+            "generatorVersion" to generatorVersion,
+            "generatorDate" to generatorDate,
+            "generatorYear" to generatorYear,
+            "generatorClass" to generatorClass,
+            "inputSpec" to inputSpec,
+            "contextPath" to contextPath,
+            "basePathWithoutHost" to basePathWithoutHost,
+            "basePath" to basePath,
+            "apiPackage" to apiPackage,
+            "modelPackage" to modelPackage,
+            "testPackage" to testPackage,
+            "mainClassName" to mainClassName,
+            "additionalProperties" to additionalProperties,
+            "appName" to appName,
+            "appVersion" to appVersion,
+            "appDescription" to appDescription,
+            "infoEmail" to infoEmail,
+            "infoName" to infoName,
+            "infoUrl" to infoUrl,
+            "licenseInfo" to licenseInfo,
+            "licenseUrl" to licenseUrl,
+            "licenseName" to licenseName,
+            "termsOfService" to termsOfService,
+            "model" to model,
+            "models" to models,
+            "operation" to operation,
+            "operations" to operations,
+            "api" to api,
+            "apis" to apis,
+        )
     }
 
     /**
-     * @deprecated the NitroGenerator class needs this because it's still in java.
+     * generates a deep copy of the template data to transform on a per-template basis
      */
     @JsonIgnore
     fun getCopy(): NitroGeneratorData {
-        return copy()
+        return copy(
+            additionalProperties = additionalProperties.toMutableMap(),
+            model = model?.copy(),
+            models = models.map { it.copy() }.toMutableList(),
+            operation = operation?.copy(),
+            operations = operations.map { it.copy() }.toMutableList(),
+            api = api?.copy(),
+            apis = apis.map { it.copy() }.toMutableList(),
+        )
     }
 }

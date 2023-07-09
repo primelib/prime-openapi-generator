@@ -80,7 +80,7 @@
             </else>
         </if>
     </logger>
-    <logger name="com.github.twitch4j.codegen" level="${log.level:-info}">
+    <logger name="io.github.primelib.primecodegen" level="${log.level:-info}">
         <!-- Colorize by passing -Dcolor -->
         <if condition='isDefined("color")'>
             <then>

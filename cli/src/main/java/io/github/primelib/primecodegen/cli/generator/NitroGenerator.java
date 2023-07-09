@@ -3,8 +3,8 @@ package io.github.primelib.primecodegen.cli.generator;
 import io.github.primelib.primecodegen.cli.domain.GeneratorContext;
 import io.github.primelib.primecodegen.cli.util.NitroUtils;
 import io.github.primelib.primecodegen.core.api.PrimeCodegenBase;
-import io.github.primelib.primecodegen.core.domain.config.PrimeIterator;
 import io.github.primelib.primecodegen.core.domain.config.PrimeTemplateSpec;
+import io.github.primelib.primecodegen.core.domain.config.TemplateIterator;
 import io.github.primelib.primecodegen.core.domain.config.TemplateScope;
 import io.github.primelib.primecodegen.core.domain.template.NitroGeneratorApiData;
 import io.github.primelib.primecodegen.core.domain.template.NitroGeneratorData;
@@ -244,19 +244,26 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
     protected void generateNitroFileModel(GeneratorContext ctx, PrimeTemplateSpec file, Boolean skipped) throws IOException {
         if (skipped) return;
 
-        if (PrimeIterator.ONCE_MODEL.equals(file.getIterator())) {
-        } else if (PrimeIterator.EACH_MODEL.equals(file.getIterator())) {
+        if (TemplateIterator.ONCE_MODEL.equals(file.getIterator())) {
+        } else if (TemplateIterator.EACH_MODEL.equals(file.getIterator())) {
             ctx.getModels().keySet().stream().parallel().forEach(name -> {
                 try {
                     NitroGeneratorData templateData = nitroGeneratorData.getCopy();
                     templateData.setModel(NitroGeneratorModelData.Companion.of(ctx.getModels().get(name), this.config));
                     templateData.setModels(NitroGeneratorModelData.Companion.ofList(ctx.getModels().values(), this.config));
+
+                    // dynamic filter and template transformation
+                    if (!file.getFilter().invoke(templateData)) {
+                        return;
+                    }
+                    file.getTransform().invoke(templateData);
+
                     processFile(ctx, file, name, templateData.asMap(), file.getSkippedBy());
                 } catch (Exception ex) {
                     log.warn("failed to generate file {} [Template: {}]", file.getTargetFileName(), file.getSourceTemplate(), ex);
                 }
             });
-        } else if (PrimeIterator.EACH_API_OPERATION.equals(file.getIterator())) {
+        } else if (TemplateIterator.EACH_API_OPERATION.equals(file.getIterator())) {
             ctx.getApiKeys().stream().parallel().forEach(name -> {
                 List<NitroGeneratorOperationData> operations = NitroGeneratorOperationData.Companion.ofList(ctx.getApiOperations().get(name), this.config);
                 operations.stream().parallel().forEach(operation -> {
@@ -266,6 +273,13 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
                         templateData.setOperation(operation);
                         templateData.setOperations(operations);
                         templateData.setApi(NitroGeneratorApiData.Companion.of(ctx.getApiMap().get(name), this.config));
+
+                        // dynamic filter and template transformation
+                        if (!file.getFilter().invoke(templateData)) {
+                            return;
+                        }
+                        file.getTransform().invoke(templateData);
+
                         processFile(ctx, file, operation.getClassname(), templateData.asMap(), file.getSkippedBy());
                     } catch (Exception ex) {
                         log.warn("failed to generate file {} [Template: {}]", file.getTargetFileName(), file.getSourceTemplate(), ex);
@@ -280,12 +294,19 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
     protected void generateNitroFileApi(GeneratorContext ctx, PrimeTemplateSpec file, Boolean skipped) throws IOException {
         if (skipped) return;
 
-        if (PrimeIterator.ONCE_API.equals(file.getIterator())) {
+        if (TemplateIterator.ONCE_API.equals(file.getIterator())) {
             try {
                 NitroGeneratorData templateData = nitroGeneratorData.getCopy();
                 templateData.setModels(NitroGeneratorModelData.Companion.ofList(ctx.getModels().values(), this.config));
                 templateData.setOperations(NitroGeneratorOperationData.Companion.ofList(ctx.getApiOperations().values().stream().flatMap(Collection::stream).collect(Collectors.toList()), this.config));
                 templateData.setApis(NitroGeneratorApiData.Companion.ofList(ctx.getApiMap().values(), this.config));
+
+                // dynamic filter and template transformation
+                if (!file.getFilter().invoke(templateData)) {
+                    return;
+                }
+                file.getTransform().invoke(templateData);
+
                 processFile(ctx, file, file.getTargetFileName(), templateData.asMap(), file.getSkippedBy());
             } catch (Exception ex) {
                 log.warn("failed to generate file {} [Template: {}]", file.getTargetFileName(), file.getSourceTemplate(), ex);
@@ -294,13 +315,20 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
             // nitroGeneratorData.setModels(NitroGeneratorModelData.ofList(ctx.getModels().values(), this.config));
             // nitroGeneratorData.setOperations(NitroGeneratorOperationData.ofList(ctx.getOperations().values(), this.config));
             // nitroGeneratorData.setApi(NitroGeneratorApiData.of(ctx.getApiOperations(), this.config));
-        } else if (PrimeIterator.EACH_API.equals(file.getIterator())) {
+        } else if (TemplateIterator.EACH_API.equals(file.getIterator())) {
             ctx.getApiKeys().stream().parallel().forEach(name -> {
                 try {
                     NitroGeneratorData templateData = nitroGeneratorData.getCopy();
                     templateData.setModels(NitroGeneratorModelData.Companion.ofList(ctx.getModels().values(), this.config));
                     templateData.setOperations(NitroGeneratorOperationData.Companion.ofList(ctx.getApiOperations().get(name), this.config));
                     templateData.setApi(NitroGeneratorApiData.Companion.of(ctx.getApiMap().get(name), this.config));
+
+                    // dynamic filter and template transformation
+                    if (!file.getFilter().invoke(templateData)) {
+                        return;
+                    }
+                    file.getTransform().invoke(templateData);
+
                     processFile(ctx, file, name, templateData.asMap(), file.getSkippedBy());
                 } catch (Exception ex) {
                     log.warn("failed to generate file {} [Template: {}]", file.getTargetFileName(), file.getSourceTemplate(), ex);
@@ -317,6 +345,13 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
         try {
             NitroGeneratorData templateData = nitroGeneratorData.getCopy();
             templateData.setModels(NitroGeneratorModelData.Companion.ofList(ctx.getModels().values(), this.config));
+
+            // dynamic filter and template transformation
+            if (!file.getFilter().invoke(templateData)) {
+                return;
+            }
+            file.getTransform().invoke(templateData);
+
             processFile(ctx, file, file.getTargetFileName(), templateData.asMap(), file.getSkippedBy());
         } catch (Exception ex) {
             log.warn("failed to generate file {} [Template: {}]", file.getTargetFileName(), file.getSourceTemplate(), ex);
