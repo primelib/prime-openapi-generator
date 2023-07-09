@@ -44,3 +44,6 @@ gradle.properties
 # CI
 .dist
 .tmp
+
+# generator
+.openapi-generator/
