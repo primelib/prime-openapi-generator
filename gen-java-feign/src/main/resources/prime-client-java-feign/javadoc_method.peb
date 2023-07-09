@@ -1,11 +1,11 @@
 {# @pebvariable name="operation" type="org.openapitools.codegen.CodegenOperation" #}
     /**
      * {{ operation.summary }}{{ newline() }}
-     * <p>
 {% if operation.notes is not empty %}
+     * <p>
 {{ javadocDescription("     * ", operation.notes) }}
-     *
 {% endif %}
+     *
 {# Authentcation #}
 {% if operation.vendorExtensions['x-required-scopes'] is not empty %}
      * Authentication - Required Scopes: {{ operation.vendorExtensions['x-required-scopes'] }}{{ newline() }}
