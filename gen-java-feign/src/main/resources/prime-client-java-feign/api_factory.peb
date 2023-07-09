@@ -10,21 +10,34 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import feign.Feign;
 import feign.Logger;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
+import feign.micrometer.MicrometerCapability;
 import feign.okhttp.OkHttpClient;
+import feign.reactive.ReactorFeign;
+import feign.reactive.RxJavaFeign;
 import feign.slf4j.Slf4jLogger;
-import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import io.github.resilience4j.bulkhead.BulkheadRegistry;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.github.resilience4j.feign.FeignDecorators;
 import io.github.resilience4j.feign.Resilience4jFeign;
-import io.github.resilience4j.ratelimiter.RateLimiter;
-import io.github.resilience4j.retry.Retry;
+import io.github.resilience4j.micrometer.tagged.TaggedBulkheadMetrics;
+import io.github.resilience4j.micrometer.tagged.TaggedCircuitBreakerMetrics;
+import io.github.resilience4j.micrometer.tagged.TaggedRateLimiterMetrics;
+import io.github.resilience4j.micrometer.tagged.TaggedRetryMetrics;
+import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
+import io.github.resilience4j.retry.RetryRegistry;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.function.Consumer;
+import io.reactivex.Flowable;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+import java.lang.reflect.Method;
 
 {# Information #}
 @NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
@@ -63,19 +76,63 @@ public class {{ t.mainClassName }}Factory {
     private static <T> T buildClient(Consumer<{{ t.mainClassName }}FactorySpec<T>> spec) {
         {{ t.mainClassName }}FactorySpec<T> config = new {{ t.mainClassName }}FactorySpec<>(spec);
 
-        FeignDecorators decorators = FeignDecorators.builder()
-                .withRateLimiter(RateLimiter.ofDefaults(config.backendName()))
-                .withCircuitBreaker(CircuitBreaker.ofDefaults(config.backendName()))
-                .withRetry(Retry.ofDefaults(config.backendName()))
-                .build();
+        // builder
+        Feign.Builder builder;
+        switch (detectVariant(config.api())) {
+            case "reactor":
+                builder = ReactorFeign.builder();
+                break;
+            case "rxjava":
+                builder = RxJavaFeign.builder();
+                break;
+            default:
+                // registries
+                BulkheadRegistry bulkheadRegistry = BulkheadRegistry.ofDefaults();
+                RateLimiterRegistry rateLimiterRegistry = RateLimiterRegistry.ofDefaults();
+                CircuitBreakerRegistry circuitBreakerRegistry = CircuitBreakerRegistry.ofDefaults();
+                RetryRegistry retryRegistry = RetryRegistry.ofDefaults();
 
-        return Resilience4jFeign
-                .builder(decorators)
+                // decorators
+                FeignDecorators decorators = FeignDecorators.builder()
+                        .withBulkhead(bulkheadRegistry.bulkhead(config.backendName()))
+                        .withRateLimiter(rateLimiterRegistry.rateLimiter(config.backendName(), RateLimiterConfig.custom().limitForPeriod(1).limitRefreshPeriod(Duration.ofMinutes(5)).build()))
+                        .withCircuitBreaker(circuitBreakerRegistry.circuitBreaker(config.backendName()))
+                        .withRetry(retryRegistry.retry(config.backendName()))
+                        .build();
+
+                // metrics
+                TaggedBulkheadMetrics.ofBulkheadRegistry(bulkheadRegistry).bindTo(config.meterRegistry());
+                TaggedRateLimiterMetrics.ofRateLimiterRegistry(rateLimiterRegistry).bindTo(config.meterRegistry());
+                TaggedCircuitBreakerMetrics.ofCircuitBreakerRegistry(circuitBreakerRegistry).bindTo(config.meterRegistry());
+                TaggedRetryMetrics.ofRetryRegistry(retryRegistry).bindTo(config.meterRegistry());
+
+                // builder
+                builder = Resilience4jFeign.builder(decorators);
+        }
+
+        // feign client
+        return builder
                 .client(new OkHttpClient())
                 .encoder(new JacksonEncoder(MAPPER))
                 .decoder(new JacksonDecoder(MAPPER))
                 .logger(new Slf4jLogger())
                 .logLevel(Logger.Level.NONE)
+                .addCapability(new MicrometerCapability(config.meterRegistry()))
                 .target(config.api(), config.baseUrl());
+    }
+
+    @NotNull
+    private static <T> String detectVariant(Class<T> clazz) {
+        Method[] methods = clazz.getDeclaredMethods();
+
+        for (Method method : methods) {
+            if (method.getReturnType().isAssignableFrom(Mono.class) || method.getReturnType().isAssignableFrom(Flux.class)) {
+                return "reactor";
+            } else if (method.getReturnType().isAssignableFrom(Flowable.class)) {
+                return "rxjava";
+            }
+        }
+
+        return "default";
     }
 }

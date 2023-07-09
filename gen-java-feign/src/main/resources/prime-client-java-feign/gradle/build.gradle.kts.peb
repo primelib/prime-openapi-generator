@@ -1,6 +1,6 @@
 plugins {
     `java-library`
-    id("me.philippheuer.configuration") version "0.10.5"
+    id("me.philippheuer.configuration") version "0.10.6"
 }
 
 val version: String = properties["version"] as? String ?: "0.0.0"
@@ -8,6 +8,15 @@ val version: String = properties["version"] as? String ?: "0.0.0"
 projectConfiguration {
     type.set(me.philippheuer.projectcfg.domain.ProjectType.LIBRARY)
     javaVersion.set(JavaVersion.VERSION_1_8)
+}
+
+java {
+    registerFeature("reactor") {
+        usingSourceSet(sourceSets["main"])
+    }
+    registerFeature("rxjava") {
+        usingSourceSet(sourceSets["main"])
+    }
 }
 
 dependencies {
@@ -22,12 +31,23 @@ dependencies {
     implementation("io.github.openfeign:feign-jackson")
     implementation("io.github.openfeign:feign-slf4j")
     implementation("io.github.openfeign:feign-okhttp")
+    implementation("io.github.openfeign:feign-micrometer")
+    implementation("io.github.openfeign:feign-reactive-wrappers")
 
     // resilience4J
     implementation("io.github.resilience4j:resilience4j-feign:1.7.1")
+    implementation("io.github.resilience4j:resilience4j-bulkhead:1.7.1")
     implementation("io.github.resilience4j:resilience4j-retry:1.7.1")
     implementation("io.github.resilience4j:resilience4j-circuitbreaker:1.7.1")
     implementation("io.github.resilience4j:resilience4j-ratelimiter:1.7.1")
+    implementation("io.github.resilience4j:resilience4j-micrometer:1.7.1")
+
+    // metrics
+    implementation("io.micrometer:micrometer-core:1.11.1")
+
+    // reactive
+    "reactorImplementation"("io.projectreactor:reactor-core:3.5.7")
+    "rxjavaImplementation"("io.reactivex.rxjava2:rxjava:2.2.21")
 
     // test
     testImplementation("org.slf4j:slf4j-simple:2.0.7")

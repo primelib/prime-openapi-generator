@@ -14,8 +14,8 @@ import org.openapitools.codegen.CodegenType
 
 class JavaFeignGenerator : ExtendableJavaCodegenBase(), CodegenConfig, PrimeCodegenBase {
     companion object {
-        private const val CODEGEN_NAME = "prime-client-java-feign"
-        private const val CODEGEN_HELP = "Generates a $CODEGEN_NAME client library."
+        const val CODEGEN_NAME = "prime-client-java-feign"
+        const val CODEGEN_HELP = "Generates a $CODEGEN_NAME client library."
     }
 
     override fun getTag(): CodegenType {

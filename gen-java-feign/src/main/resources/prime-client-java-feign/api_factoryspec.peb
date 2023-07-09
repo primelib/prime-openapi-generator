@@ -10,6 +10,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
+
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -40,6 +43,12 @@ public final class {{ t.mainClassName }}FactorySpec<T> {
      */
     @NotNull
     private String baseUrl = "{{ t.basePath }}";
+
+    /**
+     * MeterRegistry to use for metrics
+     */
+    @NotNull
+    private MeterRegistry meterRegistry = new CompositeMeterRegistry();
 
     /**
      * Constructs a validated implementation of {@link {{ t.mainClassName }}Api}.
