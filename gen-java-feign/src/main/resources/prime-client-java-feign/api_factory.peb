@@ -150,6 +150,10 @@ public class {{ t.mainClassName }}Factory {
         Method[] methods = clazz.getDeclaredMethods();
 
         for (Method method : methods) {
+            if (method.isSynthetic()) {
+                continue;
+            }
+
             if (method.getReturnType().isAssignableFrom(Mono.class) || method.getReturnType().isAssignableFrom(Flux.class)) {
                 return "reactor";
             } else if (method.getReturnType().isAssignableFrom(Flowable.class)) {
