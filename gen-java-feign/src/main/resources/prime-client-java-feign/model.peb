@@ -3,17 +3,9 @@
 package {{ t.model.packageName }};
 
 {% include "./import.peb" with {"t": t, "imports": t.model.imports} %}
-
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import javax.annotation.processing.Generated;
-
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 
 {% if t.model.isEnum %}
 {% include "./modelEnum.peb" with {"model": t.model} %}

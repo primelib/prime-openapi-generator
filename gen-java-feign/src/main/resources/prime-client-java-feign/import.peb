@@ -7,15 +7,14 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Arrays;
 import java.util.Collections;
-
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-{% if cfg.jetbrainsAnnotationsNullable %}
-{% endif %}
-
 import javax.annotation.processing.Generated;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 {% for import in imports %}
 import {{ import.importPath }};{{ newline() }}

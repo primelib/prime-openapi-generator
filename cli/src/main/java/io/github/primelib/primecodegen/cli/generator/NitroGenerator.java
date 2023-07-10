@@ -76,13 +76,13 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
 
     public NitroGenerator(Boolean dryRun) {
         super(dryRun);
-        nitroGeneratorData.setDryRun(true);
+        nitroGeneratorData.setDryRun(dryRun);
 
         log.info("Generating with dryRun={}", dryRun);
     }
 
     public Generator opts(ClientOptInput opts) {
-        Generator gen = super.opts(opts);
+        super.opts(opts);
 
         this.opts = opts;
         this.openAPI = opts.getOpenAPI();

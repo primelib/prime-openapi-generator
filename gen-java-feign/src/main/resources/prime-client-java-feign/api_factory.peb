@@ -5,6 +5,8 @@ package {{ t.additionalProperties.get("invokerPackage") }};
 
 {% include "./import.peb" with {"t": t, "imports": t.api.imports} %}
 import {{ t.apiPackage }}.{{ t.mainClassName }}Api;
+import {{ t.apiPackage }}.{{ t.mainClassName }}ReactorApi;
+import {{ t.apiPackage }}.{{ t.mainClassName }}RxJavaApi;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;

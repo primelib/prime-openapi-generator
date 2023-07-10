@@ -2,6 +2,7 @@ package io.github.primelib.primecodegen.core.generator
 
 import io.github.primelib.primecodegen.core.api.PrimeCodegenBase
 import io.github.primelib.primecodegen.core.extensions.preprocessOperations
+import io.github.primelib.primecodegen.core.postprocess.JavaImportPostProcessor
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.media.Schema
 import org.openapitools.codegen.CodegenConfig
@@ -66,6 +67,20 @@ abstract class ExtendableJavaCodegenBase : AbstractJavaCodegen(), CodegenConfig,
         val modifiedObjs = super.postProcessOperationsWithModels(objs, allModels)
         modifiedObjs.preprocessOperations()
         return modifiedObjs
+    }
+
+    override fun postProcessFile(file: File?, fileType: String?) {
+        super.postProcessFile(file, fileType)
+        if (file == null) {
+            return
+        }
+
+        // process all files with dart extension
+        if ("java" == file.extension) {
+            var content = file.readText()
+            content = JavaImportPostProcessor.removeUnusedImports(content)
+            file.writeText(content)
+        }
     }
 
     /**
