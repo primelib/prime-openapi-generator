@@ -10,7 +10,9 @@
 {% if model.isDeprecated %} * @deprecated{% if model.vendorExtensions['x-deprecated'] is not empty %} {{ model.vendorExtensions['x-deprecated'] }}{% endif %}{{ newline() }}{% endif %}
  */
 @Data
+{% if model.codegenModel.vars is not empty %}
 @AllArgsConstructor
+{% endif %}
 @NoArgsConstructor
 {% if model.codegenModel.parent is not empty %}
 @EqualsAndHashCode(callSuper = true)
