@@ -60,37 +60,14 @@ public class {{ t.mainClassName }}Factory {
         if (config.api().isInterface()) {
             return buildClient(spec);
         } else {
-            switch (detectVariant(config.api())) {
-                case "reactor":
-                    try {
-                        {{ t.mainClassName }}ReactorApi api = buildClient(s -> {
-                            s.api({{ t.mainClassName }}ReactorApi.class);
-                            s.applySpec(config);
-                        });
-                        return config.api().getConstructor({{ t.mainClassName }}ReactorApi.class).newInstance(api);
-                    } catch (Exception e) {
-                        throw new IllegalArgumentException("api must have a constructor with one parameter of type {{ t.mainClassName }}ReactorApi");
-                    }
-                case "rxjava":
-                    try {
-                        {{ t.mainClassName }}RxJavaApi api = buildClient(s -> {
-                            s.api({{ t.mainClassName }}RxJavaApi.class);
-                            s.applySpec(config);
-                        });
-                        return config.api().getConstructor({{ t.mainClassName }}RxJavaApi.class).newInstance(api);
-                    } catch (Exception e) {
-                        throw new IllegalArgumentException("api must have a constructor with one parameter of type {{ t.mainClassName }}RxJavaApi");
-                    }
-                default:
-                    try {
-                        {{ t.mainClassName }}Api api = buildClient(s -> {
-                            s.api({{ t.mainClassName }}Api.class);
-                            s.applySpec(config);
-                        });
-                        return config.api().getConstructor({{ t.mainClassName }}Api.class).newInstance(api);
-                    } catch (Exception e) {
-                        throw new IllegalArgumentException("api must have a constructor with one parameter of type {{ t.mainClassName }}Api");
-                    }
+            try {
+                {{ t.mainClassName }}Api api = buildClient(s -> {
+                    s.api({{ t.mainClassName }}Api.class);
+                    s.applySpec(config);
+                });
+                return config.api().getConstructor({{ t.mainClassName }}Api.class).newInstance(api);
+            } catch (Exception e) {
+                throw new IllegalArgumentException("api must have a constructor with one parameter of type {{ t.mainClassName }}Api");
             }
         }
     }
@@ -102,42 +79,28 @@ public class {{ t.mainClassName }}Factory {
     private static <T> T buildClient(Consumer<{{ t.mainClassName }}FactorySpec<T>> spec) {
         {{ t.mainClassName }}FactorySpec<T> config = new {{ t.mainClassName }}FactorySpec<>(spec);
 
+        // registries
+        BulkheadRegistry bulkheadRegistry = BulkheadRegistry.ofDefaults();
+        RateLimiterRegistry rateLimiterRegistry = RateLimiterRegistry.ofDefaults();
+        CircuitBreakerRegistry circuitBreakerRegistry = CircuitBreakerRegistry.ofDefaults();
+        RetryRegistry retryRegistry = RetryRegistry.ofDefaults();
+
+        // decorators
+        FeignDecorators decorators = FeignDecorators.builder()
+                .withBulkhead(bulkheadRegistry.bulkhead(config.backendName()))
+                .withRateLimiter(rateLimiterRegistry.rateLimiter(config.backendName()))
+                .withCircuitBreaker(circuitBreakerRegistry.circuitBreaker(config.backendName()))
+                .withRetry(retryRegistry.retry(config.backendName()))
+                .build();
+
+        // metrics
+        TaggedBulkheadMetrics.ofBulkheadRegistry(bulkheadRegistry).bindTo(config.meterRegistry());
+        TaggedRateLimiterMetrics.ofRateLimiterRegistry(rateLimiterRegistry).bindTo(config.meterRegistry());
+        TaggedCircuitBreakerMetrics.ofCircuitBreakerRegistry(circuitBreakerRegistry).bindTo(config.meterRegistry());
+        TaggedRetryMetrics.ofRetryRegistry(retryRegistry).bindTo(config.meterRegistry());
+
         // builder
-        Feign.Builder builder;
-        switch (detectVariant(config.api())) {
-            case "reactor":
-                builder = ReactorFeign.builder();
-                break;
-            case "rxjava":
-                builder = RxJavaFeign.builder();
-                break;
-            default:
-                // registries
-                BulkheadRegistry bulkheadRegistry = BulkheadRegistry.ofDefaults();
-                RateLimiterRegistry rateLimiterRegistry = RateLimiterRegistry.ofDefaults();
-                CircuitBreakerRegistry circuitBreakerRegistry = CircuitBreakerRegistry.ofDefaults();
-                RetryRegistry retryRegistry = RetryRegistry.ofDefaults();
-
-                // decorators
-                FeignDecorators decorators = FeignDecorators.builder()
-                        .withBulkhead(bulkheadRegistry.bulkhead(config.backendName()))
-                        .withRateLimiter(rateLimiterRegistry.rateLimiter(config.backendName()))
-                        .withCircuitBreaker(circuitBreakerRegistry.circuitBreaker(config.backendName()))
-                        .withRetry(retryRegistry.retry(config.backendName()))
-                        .build();
-
-                // metrics
-                TaggedBulkheadMetrics.ofBulkheadRegistry(bulkheadRegistry).bindTo(config.meterRegistry());
-                TaggedRateLimiterMetrics.ofRateLimiterRegistry(rateLimiterRegistry).bindTo(config.meterRegistry());
-                TaggedCircuitBreakerMetrics.ofCircuitBreakerRegistry(circuitBreakerRegistry).bindTo(config.meterRegistry());
-                TaggedRetryMetrics.ofRetryRegistry(retryRegistry).bindTo(config.meterRegistry());
-
-                // builder
-                builder = Resilience4jFeign.builder(decorators);
-        }
-
-        // feign client
-        return builder
+        return Resilience4jFeign.builder(decorators)
                 .client(new OkHttpClient())
                 .encoder(new JacksonEncoder(MAPPER))
                 .decoder(new JacksonDecoder(MAPPER))
@@ -145,24 +108,5 @@ public class {{ t.mainClassName }}Factory {
                 .logLevel(Logger.Level.NONE)
                 .addCapability(new MicrometerCapability(config.meterRegistry()))
                 .target(config.api(), config.baseUrl());
-    }
-
-    @NotNull
-    private static <T> String detectVariant(Class<T> clazz) {
-        Method[] methods = clazz.getDeclaredMethods();
-
-        for (Method method : methods) {
-            if (method.isSynthetic()) {
-                continue;
-            }
-
-            if (method.getReturnType().isAssignableFrom(Mono.class) || method.getReturnType().isAssignableFrom(Flux.class)) {
-                return "reactor";
-            } else if (method.getReturnType().isAssignableFrom(Flowable.class)) {
-                return "rxjava";
-            }
-        }
-
-        return "default";
     }
 }

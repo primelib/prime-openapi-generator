@@ -100,6 +100,7 @@ class JavaFeignGenerator : ExtendableJavaCodegenBase(), CodegenConfig, PrimeCode
         ))
 
         // rxjava api
+        /*
         cfg.templateSpecs.add(PrimeTemplateSpec(
             description = "api interface for rxjava",
             sourceTemplate = "api_main.peb",
@@ -126,8 +127,10 @@ class JavaFeignGenerator : ExtendableJavaCodegenBase(), CodegenConfig, PrimeCode
                 data.api?.imports?.add(NitroGeneratorImport("io.reactivex.Flowable"))
             }
         ))
+        */
 
         // reactor api
+        /*
         cfg.templateSpecs.add(PrimeTemplateSpec(
             description = "api interface for reactor",
             sourceTemplate = "api_main.peb",
@@ -154,6 +157,7 @@ class JavaFeignGenerator : ExtendableJavaCodegenBase(), CodegenConfig, PrimeCode
                 data.api?.imports?.addAll(listOf(NitroGeneratorImport("reactor.core.publisher.Mono"), NitroGeneratorImport("reactor.core.publisher.Flux")))
             }
         ))
+        */
 
         // model files
         cfg.templateSpecs.add(PrimeTemplateSpec(
