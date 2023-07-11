@@ -5,7 +5,6 @@ import io.github.primelib.primecodegen.core.api.PrimeCodegenConfig
 import io.github.primelib.primecodegen.core.domain.config.PrimeTemplateSpec
 import io.github.primelib.primecodegen.core.domain.config.TemplateIterator
 import io.github.primelib.primecodegen.core.domain.config.TemplateScope
-import io.github.primelib.primecodegen.core.domain.template.NitroGeneratorImport
 import io.github.primelib.primecodegen.core.extensions.pruneOperationTags
 import io.github.primelib.primecodegen.core.generator.ExtendableJavaCodegenBase
 import io.github.primelib.primecodegen.javafeign.config.JavaFeignGeneratorConfig

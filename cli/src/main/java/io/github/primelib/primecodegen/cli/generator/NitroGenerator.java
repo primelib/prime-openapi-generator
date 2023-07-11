@@ -78,7 +78,7 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
         super(dryRun);
         nitroGeneratorData.setDryRun(dryRun);
 
-        log.info("Generating with dryRun={}", dryRun);
+        log.info("Generating with PrimeGenerator. dryRun={}", dryRun);
     }
 
     public Generator opts(ClientOptInput opts) {
