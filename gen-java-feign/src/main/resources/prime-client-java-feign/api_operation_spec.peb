@@ -22,6 +22,11 @@ import java.util.function.Consumer;
 @NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
 @Generated(value = "{{ t.generatorClass }}"{% if not cfg.hideGenerationTimestamp %}, date = "{{ t.generatorDate }}"{% endif %})
 public class {{ t.operation.classname }}OperationSpec {
+    /**
+     * allows to disable validation of the spec, use with care!
+     */
+    @ApiStatus.Experimental
+    public static Boolean VALIDATION_ENABLED = true;
 
 {% for param in t.operation.codegenOperation.allParams %}
     /**
@@ -39,7 +44,8 @@ public class {{ t.operation.classname }}OperationSpec {
     @ApiStatus.Internal
     public {{ t.operation.classname }}OperationSpec(Consumer<{{ t.operation.classname }}OperationSpec> spec) {
         spec.accept(this);
-        validate();
+        if (VALIDATION_ENABLED)
+            validate();
     }
 
     /**
