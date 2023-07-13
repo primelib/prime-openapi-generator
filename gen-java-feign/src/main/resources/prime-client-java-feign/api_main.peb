@@ -26,14 +26,14 @@ public interface {{ t.mainClassName }}Api {
 {% if operation.hasHeaderParams %}
     @Headers({
 {% for param in operation.headerParams %}
-        "{{ param.baseName }}: {% if param.baseName == "Authorization" %}Bearer {% endif %}{% if param.vendorExtensions.get("x-param-static") == true %}{{ param.defaultValue }}{% else %}{{ param.paramName | wrapin("{", "}") }}{% endif %}"{% if not loop.last %}, {% endif %}{{ newline() }}
+        "{{ param.baseName }}: {% if param.baseName == "Authorization" %}Bearer {% endif %}{% if param.vendorExtensions.getOrDefault("x-param-static", false) %}{{ param.defaultValue }}{% else %}{{ param.paramName | wrapin("{", "}") }}{% endif %}"{% if not loop.last %}, {% endif %}{{ newline() }}
 {% endfor %}
     })
 {% endif %}
 {% if operation.vendorExtensions.get("x-stability") == "experimental" %}
     @ApiStatus.Experimental
 {% endif %}
-    {% if operation.returnType is not empty %}{{ operation.returnType | formatString(t.additionalProperties.getOrDefault("primeWrapReturnType", "%s")) }}{% else %}void{% endif %} {{ operation.nickname }}({% for param in operation.allParams %}{% if param.isHeaderParam or param.isPathParam or param.isQueryParam %}@Param("{{ param.baseName }}"){% endif %} {% include "./param_annotation.peb" %}{{ param.dataType }} {{ param.paramName }}{% if not loop.last %}, {% endif %}{% endfor %});
+    {% if operation.returnType is not empty %}{{ operation.returnType | formatString(t.additionalProperties.getOrDefault("primeWrapReturnType", "%s")) }}{% else %}void{% endif %} {{ operation.nickname }}({% for param in operation.allParams %}{% if not param.vendorExtensions.getOrDefault("x-param-static", false) %}{% if param.isHeaderParam or param.isPathParam or param.isQueryParam %}@Param("{{ param.baseName }}"){% endif %} {% include "./param_annotation.peb" %}{{ param.dataType }} {{ param.paramName }}{% if not loop.last %}, {% endif %}{% endif %}{% endfor %});
 
 {% endfor %}
 }

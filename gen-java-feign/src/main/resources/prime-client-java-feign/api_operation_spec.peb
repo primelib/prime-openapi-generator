@@ -32,12 +32,14 @@ public class {{ t.operation.classname }}OperationSpec {
     public static Boolean VALIDATION_ENABLED = true;
 
 {% for param in t.operation.codegenOperation.allParams %}
+{% if not param.vendorExtensions.getOrDefault("x-param-static", false) %}
     /**
 {{ javadocDescription("     * ", param.description) }}
      */
     {% include "./param_annotation.peb" %}{{ newline() }}
     private {{ param.dataType }} {{ param.paramName }}{% if param.defaultValue is not empty %} = {% if param.isString %}"{% endif %}{{ param.defaultValue }}{% if param.isString %}"{% endif %}{% endif %};{{ newline() }}
 
+{% endif %}
 {% endfor %}
     /**
      * Constructs a validated implementation of {@link {{ t.operation.classname }}OperationSpec}.
@@ -58,7 +60,7 @@ public class {{ t.operation.classname }}OperationSpec {
      */
     public void validate() {
 {% for param in t.operation.codegenOperation.allParams %}
-{% if param.required %}
+{% if not param.vendorExtensions.getOrDefault("x-param-static", false) and param.required %}
         Objects.requireNonNull({{ param.paramName }}, "{{ param.paramName }} is a required parameter!");
 {% endif %}
 {% endfor %}

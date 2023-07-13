@@ -12,7 +12,9 @@
 {% endif %}
 {# Params & ReturnType #}
 {% for param in operation.allParams %}
+{% if not param.vendorExtensions.getOrDefault("x-param-static", false) %}
      * {% include "./javadoc_param.peb" %}
+{% endif %}
 {% endfor %}
 {# External Documentation #}
 {% if operation.externalDocs is not empty %}
