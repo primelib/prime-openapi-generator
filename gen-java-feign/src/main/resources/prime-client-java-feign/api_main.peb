@@ -16,7 +16,7 @@ public interface {{ t.mainClassName }}Api {
 
 {% for operation in t.api.operations %}
 {# @pebvariable name="operation" type="org.openapitools.codegen.CodegenOperation" #}
-{% include "./javadoc_method.peb" %}{{ newline() }}
+{% include "./javadoc_method.peb" with {"t": t, "operation": operation} %}{{ newline() }}
 {# Deprecated #}
 {% if operation.isDeprecated %}
     @Deprecated{{ newline() }}
@@ -26,7 +26,7 @@ public interface {{ t.mainClassName }}Api {
 {% if operation.hasHeaderParams %}
     @Headers({
 {% for param in operation.headerParams %}
-        "{{ param.baseName }}: {% if param.baseName == "Authorization" %}Bearer {% endif %}{{ param.paramName | wrapin("{", "}") }}"{% if not loop.last %}, {% endif %}{{ newline() }}
+        "{{ param.baseName }}: {% if param.baseName == "Authorization" %}Bearer {% endif %}{% if param.vendorExtensions.get("x-param-static") == true %}{{ param.defaultValue }}{% else %}{{ param.paramName | wrapin("{", "}") }}{% endif %}"{% if not loop.last %}, {% endif %}{{ newline() }}
 {% endfor %}
     })
 {% endif %}

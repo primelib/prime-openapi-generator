@@ -5,8 +5,8 @@ import io.github.primelib.primecodegen.templateengine.pebble.filter.PadRightFilt
 import io.github.primelib.primecodegen.templateengine.pebble.filter.StringFormatFilter
 import io.github.primelib.primecodegen.templateengine.pebble.filter.WrapInFilter;
 import io.github.primelib.primecodegen.templateengine.pebble.function.GetOrDefaultFunction;
-import io.github.primelib.primecodegen.templateengine.pebble.function.JavadocDescription
-import io.github.primelib.primecodegen.templateengine.pebble.function.JavadocParamDescription
+import io.github.primelib.primecodegen.templateengine.pebble.function.JavadocDescriptionFunction
+import io.github.primelib.primecodegen.templateengine.pebble.function.JavadocDescriptionInlineFunction
 import io.github.primelib.primecodegen.templateengine.pebble.function.NewLineFunction;
 import io.github.primelib.primecodegen.templateengine.pebble.operator.StartsWithOperator;
 import io.pebbletemplates.pebble.attributes.AttributeResolver;
@@ -37,8 +37,8 @@ class CodeGenPebbleExtension : Extension {
         return mapOf(
             "newline" to NewLineFunction(),
             "getOrDefault" to GetOrDefaultFunction(),
-            "javadocParamDescription" to JavadocParamDescription(),
-            "javadocDescription" to JavadocDescription(),
+            "javadocDescription" to JavadocDescriptionFunction(),
+            "javadocDescriptionInline" to JavadocDescriptionInlineFunction(),
         )
     }
 

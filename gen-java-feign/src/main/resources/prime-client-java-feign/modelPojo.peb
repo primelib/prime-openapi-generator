@@ -32,7 +32,7 @@ public class {{ model.classname }}{% if model.codegenModel.parent is not empty %
 {% for var in model.codegenModel.vars %}
 {% if var.description is not empty %}
     /**
-     * {{ var.description }}{{ newline() }}
+{{ javadocDescription("     * ", var.description) }}
      */
 {% endif %}
     @JsonProperty("{{ var.baseName }}")

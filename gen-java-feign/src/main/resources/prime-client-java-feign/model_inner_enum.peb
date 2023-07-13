@@ -1,6 +1,7 @@
+{# @pebvariable name="var" type="org.openapitools.codegen.CodegenProperty" #}
 public enum {{ var.enumName }} {
     {% for enumvar in var.allowableValues.enumVars %}
-    {{ enumvar.name }}({{ enumvar.value }}){% if not loop.last %},{% else %};{% endif %}{{ newline() }}
+    {{ enumvar.name }}({{ enumvar.value }}){% if not loop.last %},{% else %};{% endif %}{% if var.description is not empty %} // {{ var.description }}{% endif %}{{ newline() }}
     {% endfor %}
 
     private final String text;
@@ -12,11 +13,4 @@ public enum {{ var.enumName }} {
         this.text = text;
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Enum#toString()
-     */
-    @Override
-    public String toString() {
-        return text;
-    }
 }

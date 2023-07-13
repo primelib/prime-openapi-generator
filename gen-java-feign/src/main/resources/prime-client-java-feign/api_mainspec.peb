@@ -21,8 +21,9 @@ public class {{ t.mainClassName }}SpecApi {
     }
 
 {% for operation in t.api.operations %}
+{# @pebvariable name="operation" type="org.openapitools.codegen.CodegenOperation" #}
     /**
-     * {{ operation.summary }}{{ newline() }}
+{{ javadocDescription("     * ", operation.summary) }}
 {% if operation.notes is not empty %}
      * <p>
 {{ javadocDescription("     * ", operation.notes) }}

@@ -1,5 +1,6 @@
 {# @pebvariable name="t" type="io.github.primelib.primecodegen.core.domain.template.NitroGeneratorData" #}
 {# @pebvariable name="cfg" type="io.github.primelib.primecodegen.javafeign.config.JavaFeignGeneratorConfig" #}
+{# @pebvariable name="param" type="org.openapitools.codegen.CodegenParameter" #}
 {% include "./licenseInfo.peb" %}
 package {{ t.additionalProperties.get("specPackage") }};
 
@@ -14,8 +15,10 @@ import java.util.function.Consumer;
  * {{ t.operation.classname }}Spec
  * <p>
  * Specification for the {{ t.operation.classname }} operation.
+{% if t.operation.codegenOperation.summary is not empty %}
  * <p>
- * {{ t.operation.codegenOperation.summary }}{{ newline() }}
+{{ javadocDescription(" * ", t.operation.codegenOperation.summary) }}
+{% endif %}
  */
 @Data
 @Accessors(fluent = true)
@@ -33,8 +36,8 @@ public class {{ t.operation.classname }}OperationSpec {
 {{ javadocDescription("     * ", param.description) }}
      */
     {% include "./param_annotation.peb" %}{{ newline() }}
-    private {{ param.dataType }} {{ param.paramName }};
-{{ newline() }}
+    private {{ param.dataType }} {{ param.paramName }}{% if param.defaultValue is not empty %} = {% if param.isString %}"{% endif %}{{ param.defaultValue }}{% if param.isString %}"{% endif %}{% endif %};{{ newline() }}
+
 {% endfor %}
     /**
      * Constructs a validated implementation of {@link {{ t.operation.classname }}OperationSpec}.

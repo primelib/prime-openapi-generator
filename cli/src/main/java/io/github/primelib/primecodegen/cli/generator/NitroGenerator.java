@@ -164,7 +164,7 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
         nitroGeneratorData.setConfig(codegen.cfg());
 
         // error prevention
-        if (this.config.apiTemplateFiles().size() > 0) {
+        if (config.apiTemplateFiles().size() > 0) {
             log.error("apiTemplateFiles only work when using the default generator");
         }
 
@@ -178,9 +178,9 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
 
         // process
         NitroUtils.flattenOpenAPISpec(openAPI);
-        this.configureGeneratorProperties();
-        this.configureOpenAPIInfo();
-        this.config.processOpenAPI(this.openAPI);
+        configureGeneratorProperties();
+        configureOpenAPIInfo();
+        config.processOpenAPI(this.openAPI);
         // this.processUserDefinedTemplates(); // TODO: not supported yet
 
         // context
