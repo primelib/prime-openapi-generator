@@ -76,6 +76,7 @@ data class NitroGeneratorData(
     var operations: MutableList<NitroGeneratorOperationData> = mutableListOf(),
     var api: NitroGeneratorApiData? = null,
     var apis: MutableList<NitroGeneratorApiData> = mutableListOf(),
+    var auth: AuthTemplateData? = null,
 ) {
     @JsonIgnore
     fun asMap(): MutableMap<String, Any?> {
@@ -122,6 +123,7 @@ data class NitroGeneratorData(
             "operations" to operations,
             "api" to api,
             "apis" to apis,
+            "auth" to auth,
         )
     }
 
@@ -138,6 +140,7 @@ data class NitroGeneratorData(
             operations = operations.map { it.copy() }.toMutableList(),
             api = api?.copy(),
             apis = apis.map { it.copy() }.toMutableList(),
+            auth = auth?.copy(),
         )
     }
 }

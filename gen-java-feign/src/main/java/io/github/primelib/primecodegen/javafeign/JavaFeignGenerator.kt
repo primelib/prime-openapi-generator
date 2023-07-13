@@ -56,11 +56,13 @@ class JavaFeignGenerator : ExtendableJavaCodegenBase(), CodegenConfig, PrimeCode
 
         // custom package
         val specFolder = packageToPath(outputFolder, sourceFolder, modelPackage.substringBeforeLast(".") + ".spec")
+        val authFolder = packageToPath(outputFolder, sourceFolder, modelPackage.substringBeforeLast(".") + ".auth")
         additionalProperties["specPackage"] = modelPackage.substringBeforeLast(".") + ".spec"
+        additionalProperties["authPackage"] = modelPackage.substringBeforeLast(".") + ".auth"
         additionalProperties["invokerPackage"] = modelPackage.substringBeforeLast(".")
 
         // ensure directories exist
-        createOutputDirectories(listOf(invokerFolder, apiFolder, modelFolder, specFolder))
+        createOutputDirectories(listOf(invokerFolder, apiFolder, modelFolder, specFolder, authFolder))
 
         // factory
         cfg.templateSpecs.add(PrimeTemplateSpec(
@@ -174,6 +176,48 @@ class JavaFeignGenerator : ExtendableJavaCodegenBase(), CodegenConfig, PrimeCode
             targetFileName = "{name}OperationSpec.java",
             scope = TemplateScope.MODEL,
             iterator = TemplateIterator.EACH_API_OPERATION,
+        ))
+
+        // auth files
+        cfg.templateSpecs.add(PrimeTemplateSpec(
+            description = "auth method interface",
+            sourceTemplate = "auth/authMethod.peb",
+            targetDirectory = authFolder,
+            targetFileName = "AuthMethod.java",
+            scope = TemplateScope.API,
+            iterator = TemplateIterator.EACH_API,
+        ))
+        cfg.templateSpecs.add(PrimeTemplateSpec(
+            description = "feign authentication interceptor",
+            sourceTemplate = "auth/authInterceptor.peb",
+            targetDirectory = authFolder,
+            targetFileName = "AuthInterceptor.java",
+            scope = TemplateScope.API,
+            iterator = TemplateIterator.EACH_API,
+        ))
+        cfg.templateSpecs.add(PrimeTemplateSpec(
+            description = "auth method - apiKey",
+            sourceTemplate = "auth/apiKeyAuthSpec.peb",
+            targetDirectory = authFolder,
+            targetFileName = "ApiKeyAuthSpec.java",
+            scope = TemplateScope.API,
+            iterator = TemplateIterator.EACH_API,
+        ))
+        cfg.templateSpecs.add(PrimeTemplateSpec(
+            description = "auth method - basic",
+            sourceTemplate = "auth/basicAuthSpec.peb",
+            targetDirectory = authFolder,
+            targetFileName = "BasicAuthSpec.java",
+            scope = TemplateScope.API,
+            iterator = TemplateIterator.EACH_API,
+        ))
+        cfg.templateSpecs.add(PrimeTemplateSpec(
+            description = "auth method - bearer token",
+            sourceTemplate = "auth/bearerAuthSpec.peb",
+            targetDirectory = authFolder,
+            targetFileName = "BearerAuthSpec.java",
+            scope = TemplateScope.API,
+            iterator = TemplateIterator.EACH_API,
         ))
 
         // supporting files

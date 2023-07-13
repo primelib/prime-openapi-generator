@@ -5,9 +5,14 @@ package {{ t.additionalProperties.get("invokerPackage") }};
 
 {% include "./import.peb" with {"t": t, "imports": t.api.imports} %}
 import {{ t.apiPackage }}.{{ t.mainClassName }}Api;
+import {{ t.additionalProperties.get("authPackage") }}.AuthMethod;
+import {{ t.additionalProperties.get("authPackage") }}.ApiKeyAuthSpec;
+import {{ t.additionalProperties.get("authPackage") }}.BasicAuthSpec;
+import {{ t.additionalProperties.get("authPackage") }}.BearerAuthSpec;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import io.micrometer.core.instrument.MeterRegistry;
@@ -45,6 +50,12 @@ public final class {{ t.mainClassName }}FactorySpec<T> {
     private String baseUrl = "{{ t.basePath }}";
 
     /**
+     * The authentication methods to use
+     */
+    @Nullable
+    private List<AuthMethod> auth = new ArrayList<>(5);
+
+    /**
      * MeterRegistry to use for metrics
      */
     @NotNull
@@ -75,9 +86,28 @@ public final class {{ t.mainClassName }}FactorySpec<T> {
         }
     }
 
+    public ApiKeyAuthSpec apiKeyAuth(Consumer<ApiKeyAuthSpec> spec) {
+        ApiKeyAuthSpec method = new ApiKeyAuthSpec(spec);
+        auth.add(method);
+        return method;
+    }
+
+    public BasicAuthSpec basicAuth(Consumer<BasicAuthSpec> spec) {
+        BasicAuthSpec method = new BasicAuthSpec(spec);
+        auth.add(method);
+        return method;
+    }
+
+    public BearerAuthSpec bearerAuth(Consumer<BearerAuthSpec> spec) {
+        BearerAuthSpec method = new BearerAuthSpec(spec);
+        auth.add(method);
+        return method;
+    }
+
     public void applySpec({{ t.mainClassName }}FactorySpec<?> spec) {
         backendName(spec.backendName());
         baseUrl(spec.baseUrl());
+        auth(spec.auth());
         meterRegistry(spec.meterRegistry());
     }
 }
