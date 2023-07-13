@@ -202,6 +202,7 @@ class JavaFeignGenerator : ExtendableJavaCodegenBase(), CodegenConfig, PrimeCode
             targetFileName = "ApiKeyAuthSpec.java",
             scope = TemplateScope.API,
             iterator = TemplateIterator.EACH_API,
+            filter = { data -> data.auth?.hasApiKey ?: false },
         ))
         cfg.templateSpecs.add(PrimeTemplateSpec(
             description = "auth method - basic",
@@ -210,6 +211,7 @@ class JavaFeignGenerator : ExtendableJavaCodegenBase(), CodegenConfig, PrimeCode
             targetFileName = "BasicAuthSpec.java",
             scope = TemplateScope.API,
             iterator = TemplateIterator.EACH_API,
+            filter = { data -> data.auth?.hasBasic ?: false },
         ))
         cfg.templateSpecs.add(PrimeTemplateSpec(
             description = "auth method - bearer token",
@@ -218,6 +220,7 @@ class JavaFeignGenerator : ExtendableJavaCodegenBase(), CodegenConfig, PrimeCode
             targetFileName = "BearerAuthSpec.java",
             scope = TemplateScope.API,
             iterator = TemplateIterator.EACH_API,
+            filter = { data -> data.auth?.hasBearer ?: false },
         ))
 
         // supporting files

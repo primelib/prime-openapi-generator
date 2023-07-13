@@ -86,24 +86,30 @@ public final class {{ t.mainClassName }}FactorySpec<T> {
         }
     }
 
+{% if t.auth.hasApiKey %}
     public ApiKeyAuthSpec apiKeyAuth(Consumer<ApiKeyAuthSpec> spec) {
         ApiKeyAuthSpec method = new ApiKeyAuthSpec(spec);
         auth.add(method);
         return method;
     }
 
+{% endif %}
+{% if t.auth.hasBasic %}
     public BasicAuthSpec basicAuth(Consumer<BasicAuthSpec> spec) {
         BasicAuthSpec method = new BasicAuthSpec(spec);
         auth.add(method);
         return method;
     }
 
+{% endif %}
+{% if t.auth.hasBearer %}
     public BearerAuthSpec bearerAuth(Consumer<BearerAuthSpec> spec) {
         BearerAuthSpec method = new BearerAuthSpec(spec);
         auth.add(method);
         return method;
     }
 
+{% endif %}
     public void applySpec({{ t.mainClassName }}FactorySpec<?> spec) {
         backendName(spec.backendName());
         baseUrl(spec.baseUrl());
