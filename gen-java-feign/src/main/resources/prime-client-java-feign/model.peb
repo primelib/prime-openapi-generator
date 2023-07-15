@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-{% if t.model.isEnum %}
+{% if t.model.codegenModel.isEnum %}
 {% include "./modelEnum.peb" with {"model": t.model} %}
 {% else %}
 {% include "./modelPojo.peb" with {"model": t.model} %}

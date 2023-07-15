@@ -92,10 +92,10 @@ class JavaFeignGenerator : ExtendableJavaCodegenBase(), CodegenConfig, PrimeCode
             iterator = TemplateIterator.EACH_API,
         ))
         cfg.templateSpecs.add(PrimeTemplateSpec(
-            description = "spec variant of the primary api interface",
+            description = "consumer spec variant of the primary api interface",
             sourceTemplate = "api_mainspec.peb",
             targetDirectory = apiFolder,
-            targetFileName = "{mainClassName}SpecApi.java",
+            targetFileName = "{mainClassName}ConsumerApi.java",
             scope = TemplateScope.API,
             iterator = TemplateIterator.EACH_API,
         ))

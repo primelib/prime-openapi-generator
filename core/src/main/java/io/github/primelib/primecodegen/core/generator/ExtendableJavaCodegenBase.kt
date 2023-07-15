@@ -31,9 +31,16 @@ abstract class ExtendableJavaCodegenBase : AbstractJavaCodegen(), CodegenConfig,
         supportingFiles.clear()
         importMapping.remove("ApiModelProperty", "io.swagger.annotations.ApiModelProperty")
         importMapping.remove("ApiModel", "io.swagger.annotations.ApiModel")
+        importMapping.remove("DateTime")
+        importMapping.remove("LocalDateTime")
+        importMapping.remove("LocalDate")
+        importMapping.remove("LocalTime")
         dateLibrary = "java8"
         typeMapping["date"] = "Instant"
         importMapping["Instant"] = "java.time.Instant"
+
+        // clear reserved words not used by our generator
+        reservedWords.removeAll(setOf("ApiClient", "ApiException", "ApiResponse", "Configuration", "StringUtil"))
     }
 
     override fun processOpts() {
@@ -54,8 +61,13 @@ abstract class ExtendableJavaCodegenBase : AbstractJavaCodegen(), CodegenConfig,
         model.imports.remove("ApiModelProperty")
         model.imports.remove("ApiModel")
 
-        model.vars.forEach { p ->
-            // container inner type for enums
+        // container inner type for enums
+        if (model.isEnum) {
+            val matchResult = containerInnerTypePattern.matchEntire(model.dataType)
+            val innerType = matchResult?.groupValues?.getOrNull(1) ?: model.dataType
+            model.vendorExtensions["x-enum-innerType"] = innerType
+        }
+        model.vars.filter { p -> p.isEnum }.forEach { p ->
             val matchResult = containerInnerTypePattern.matchEntire(p.dataType)
             val innerType = matchResult?.groupValues?.getOrNull(1) ?: p.dataType
             p.vendorExtensions["x-enum-innerType"] = innerType

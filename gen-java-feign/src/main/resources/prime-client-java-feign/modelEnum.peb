@@ -4,32 +4,20 @@
  * {% if model.title is empty %}{{ model.classname }}{{ else }}{{ model.title }}{% endif %}{{ newline() }}
  * {{ model.description }}{{ newline() }}
  *
-{% if model.isDeprecated %} * @deprecated{% if model.vendorExtensions['x-deprecated'] is not empty %} {{ model.vendorExtensions['x-deprecated'] }}{% endif %}{{ newline() }}{% endif %}
- */
-{% if model.codegenModel.vars is not empty %}
-@JsonPropertyOrder({
-{% for var in model.vars %}
-    "{{ var.baseName }}"{% if not loop.last %},{% endif %}{{ newline() }}
-{% endfor %}
-})
+{% if model.isDeprecated and model.vendorExtensions['x-deprecated'] is not empty %}
+ * @deprecated {{ model.vendorExtensions['x-deprecated'] }}{{ newline() }}
 {% endif %}
-@JsonTypeName("{{ model.name }}")
-@Data
-{% if model.isDeprecated %}@Deprecated{{ newline() }}{% endif %}
-@Generated(value = "{{ generatorClass }}"{% if not hideGenerationTimestamp %}, date = "{{ generatedDate }}"{% endif %})
-public class {{ model.classname }}{% if model.parent is not empty %} extends {{ model.parent }}{% endif %} {
-    {% for var in model.vars %}
-    @JsonProperty("{{ var.baseName }}")
-    private {{ var.datatypeWithEnum }} {{var.name}}{% if var.defaultValue is not empty %} = {{ var.defaultValue }}{% endif %};
-
+ */
+@JsonTypeName("{{ model.codegenModel.name }}")
+{% if model.isDeprecated %}
+@Deprecated{{ newline() }}
+{% endif %}
+@AllArgsConstructor
+@Generated(value = "{{ t.generatorClass }}"{% if not cfg.hideGenerationTimestamp %}, date = "{{ t.generatorDate }}"{% endif %})
+public enum {{ model.codegenModel.classname }}{% if model.codegenModel.parent is not empty %} extends {{ model.codegenModel.parent }}{% endif %} {
+{% for enumvar in model.codegenModel.allowableValues.enumVars %}
+    {{ enumvar.name }}({{ enumvar.value }}){% if not loop.last %},{% else %};{% endif %}{{ newline() }}
 {% endfor %}
 
-    public {{ dataType }} getValue() {
-        return value;
-    }
-
-    @Override
-    public String toString() {
-        return String.valueOf(value);
-    }
+    private final {{ model.codegenModel.vendorExtensions.getOrDefault("x-enum-innerType", model.codegenModel.dataType) }} value;
 }

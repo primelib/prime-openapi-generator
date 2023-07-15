@@ -13,7 +13,8 @@
 {% if model.codegenModel.vars is not empty %}
 @AllArgsConstructor
 {% endif %}
-@NoArgsConstructor
+@Accessors(fluent = true)
+@NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
 {% if model.codegenModel.parent is not empty %}
 @EqualsAndHashCode(callSuper = true)
 {% endif %}
@@ -29,6 +30,16 @@
 @Generated(value = "{{ t.generatorClass }}"{% if not cfg.hideGenerationTimestamp %}, date = "{{ t.generatorDate }}"{% endif %})
 public class {{ model.classname }}{% if model.codegenModel.parent is not empty %} extends {{ model.codegenModel.parent }}{% endif %} {
 
+    /**
+     * Constructs a validated implementation of {@link {{ model.classname}}}.
+     *
+     * @param spec the specification to process
+     */
+    @ApiStatus.Internal
+    public {{ model.classname }}(Consumer<{{ model.classname }}> spec) {
+        spec.accept(this);
+    }
+
 {% for var in model.codegenModel.vars %}
 {% if var.description is not empty %}
     /**
@@ -36,7 +47,7 @@ public class {{ model.classname }}{% if model.codegenModel.parent is not empty %
      */
 {% endif %}
     @JsonProperty("{{ var.baseName }}")
-    private {{ var.datatypeWithEnum }} {{ var.name }}{% if var.defaultValue is not empty %} = {{ var.defaultValue }}{% endif %};
+    protected {{ var.datatypeWithEnum }} {{ var.name }}{% if var.defaultValue is not empty %} = {{ var.defaultValue }}{% endif %};
 
 {% endfor %}
 
