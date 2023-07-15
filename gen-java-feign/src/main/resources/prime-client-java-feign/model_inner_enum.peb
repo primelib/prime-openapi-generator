@@ -1,16 +1,14 @@
 {# @pebvariable name="var" type="org.openapitools.codegen.CodegenProperty" #}
-public enum {{ var.enumName }} {
-    {% for enumvar in var.allowableValues.enumVars %}
-    {{ enumvar.name }}({{ enumvar.value }}){% if not loop.last %},{% else %};{% endif %}{% if var.description is not empty %} // {{ var.description }}{% endif %}{{ newline() }}
-    {% endfor %}
-
-    private final String text;
-
+{% if var.description is not empty %}
     /**
-     * @param text
+{{ javadocDescription("     * ", var.description) }}
      */
-    {{ var.enumName }}(final String text) {
-        this.text = text;
-    }
+{% endif %}
+    @AllArgsConstructor
+    public enum {{ var.enumName }} {
+{% for enumvar in var.allowableValues.enumVars %}
+        {{ enumvar.name }}({{ enumvar.value }}){% if not loop.last %},{% else %};{% endif %}{{ newline() }}
+{% endfor %}
 
-}
+        private final {{ var.vendorExtensions.get("x-enum-innerType") }} value;
+    }

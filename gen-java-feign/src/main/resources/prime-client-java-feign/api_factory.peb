@@ -46,7 +46,6 @@ import java.lang.reflect.Method;
 
 import java.util.function.Consumer;
 
-{# Information #}
 @NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
 @Slf4j
 @Generated(value = "{{ t.generatorClass }}"{% if not cfg.hideGenerationTimestamp %}, date = "{{ t.generatorDate }}"{% endif %})
@@ -57,7 +56,7 @@ public class {{ t.mainClassName }}Factory {
             .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
             .build();
 
-    public static <T> T build(Consumer<{{ t.mainClassName }}FactorySpec<T>> spec) {
+    public static <T> T create(Consumer<{{ t.mainClassName }}FactorySpec<T>> spec) {
         {{ t.mainClassName }}FactorySpec<T> config = new {{ t.mainClassName }}FactorySpec<>(spec);
 
         if (config.api().isInterface()) {
@@ -75,8 +74,8 @@ public class {{ t.mainClassName }}Factory {
         }
     }
 
-    public static {{ t.mainClassName }}Api build() {
-        return build(spec -> spec.api({{ t.mainClassName }}Api.class));
+    public static {{ t.mainClassName }}Api create() {
+        return create(spec -> spec.api({{ t.mainClassName }}Api.class));
     }
 
     private static <T> T buildClient(Consumer<{{ t.mainClassName }}FactorySpec<T>> spec) {

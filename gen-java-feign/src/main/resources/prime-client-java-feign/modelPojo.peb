@@ -42,7 +42,7 @@ public class {{ model.classname }}{% if model.codegenModel.parent is not empty %
 
 {% for var in model.codegenModel.vars %}
 {% if var.isEnum %}
-{% include "./model_inner_enum.peb" %}{{ newline }}
+{% include "./model_inner_enum.peb" %}{{ newline() }}
 {% endif %}
 {% endfor %}
 }

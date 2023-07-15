@@ -6,6 +6,7 @@ import io.github.primelib.primecodegen.core.api.PrimeCodegenBase;
 import io.github.primelib.primecodegen.core.domain.config.PrimeTemplateSpec;
 import io.github.primelib.primecodegen.core.domain.config.TemplateIterator;
 import io.github.primelib.primecodegen.core.domain.config.TemplateScope;
+import io.github.primelib.primecodegen.core.domain.template.AuthTemplateData;
 import io.github.primelib.primecodegen.core.domain.template.NitroGeneratorApiData;
 import io.github.primelib.primecodegen.core.domain.template.NitroGeneratorData;
 import io.github.primelib.primecodegen.core.domain.template.NitroGeneratorModelData;
@@ -182,6 +183,9 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
         configureOpenAPIInfo();
         config.processOpenAPI(this.openAPI);
         // this.processUserDefinedTemplates(); // TODO: not supported yet
+
+        // auth
+        nitroGeneratorData.setAuth(AuthTemplateData.Companion.of(openAPI));
 
         // context
         GeneratorContext ctx = new GeneratorContext();

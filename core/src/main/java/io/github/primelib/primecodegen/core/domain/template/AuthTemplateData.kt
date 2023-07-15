@@ -14,7 +14,7 @@ data class AuthTemplateData(
         fun of(openApi: OpenAPI): AuthTemplateData {
             val response = AuthTemplateData()
 
-            openApi.components.securitySchemes.forEach { (name, schema) ->
+            openApi.components.securitySchemes?.forEach { (name, schema) ->
                 if (schema.type == SecurityScheme.Type.APIKEY) {
                     response.hasApiKey = true
                     response.apiKeyKeyDefault = schema.name

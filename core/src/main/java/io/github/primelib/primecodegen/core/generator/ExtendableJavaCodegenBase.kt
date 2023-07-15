@@ -20,6 +20,8 @@ import java.io.IOException
  * This is an extendable version of the AbstractJavaCodegen, which has all generated templates and legacy imports removed.
  */
 abstract class ExtendableJavaCodegenBase : AbstractJavaCodegen(), CodegenConfig, PrimeCodegenBase {
+    private val containerInnerTypePattern = Regex("""^.*<(.+)>$""")
+
     init {
         modelTemplateFiles.clear()
         apiTemplateFiles.clear()
@@ -51,6 +53,13 @@ abstract class ExtendableJavaCodegenBase : AbstractJavaCodegen(), CodegenConfig,
         // clear legacy imports from base codegen
         model.imports.remove("ApiModelProperty")
         model.imports.remove("ApiModel")
+
+        model.vars.forEach { p ->
+            // container inner type for enums
+            val matchResult = containerInnerTypePattern.matchEntire(p.dataType)
+            val innerType = matchResult?.groupValues?.getOrNull(1) ?: p.dataType
+            p.vendorExtensions["x-enum-innerType"] = innerType
+        }
     }
 
     override fun fromModel(name: String, model: Schema<*>): CodegenModel {

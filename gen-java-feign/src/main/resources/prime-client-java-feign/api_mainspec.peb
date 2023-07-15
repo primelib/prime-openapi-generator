@@ -43,6 +43,9 @@ public class {{ t.mainClassName }}SpecApi {
      * @deprecated{% if operation.vendorExtensions.x_deprecated is not empty %} {{ operation.vendorExtensions.x_deprecated }}{% endif %}{{ newline() }}
 {% endif %}
      */
+{% if operation.isDeprecated %}
+    @Deprecated
+{% endif %}
     public {% if operation.returnType is not empty %}{{ operation.returnType | formatString(t.additionalProperties.getOrDefault("primeWrapReturnType", "%s"))  }}{% else %}void{% endif %} {{ operation.nickname }}(Consumer<{{ operation.nickname | capitalize }}OperationSpec> spec) {
         {{ operation.nickname | capitalize }}OperationSpec r = new {{ operation.nickname | capitalize }}OperationSpec(spec);
         {% if operation.returnType is not empty %}return {% endif %}api.{{ operation.nickname }}({% for param in operation.allParams %}{% if not param.vendorExtensions.getOrDefault("x-param-static", false) %}r.{{ param.paramName }}(){% if not loop.last %}, {% endif %}{% endif %}{% endfor %});
