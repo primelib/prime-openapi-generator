@@ -5,6 +5,7 @@ import io.github.primelib.primecodegen.core.api.PrimeCodegenConfig
 import io.github.primelib.primecodegen.core.domain.config.PrimeTemplateSpec
 import io.github.primelib.primecodegen.core.domain.config.TemplateIterator
 import io.github.primelib.primecodegen.core.domain.config.TemplateScope
+import io.github.primelib.primecodegen.core.extensions.appendContentTypeHeaderIfMissing
 import io.github.primelib.primecodegen.core.extensions.pruneOperationTags
 import io.github.primelib.primecodegen.core.generator.ExtendableJavaCodegenBase
 import io.github.primelib.primecodegen.javafeign.config.JavaFeignGeneratorConfig
@@ -44,6 +45,7 @@ class JavaFeignGenerator : ExtendableJavaCodegenBase(), CodegenConfig, PrimeCode
 
         // truncate tags to merge all operations into one feign interface
         openAPI.pruneOperationTags()
+        openAPI.appendContentTypeHeaderIfMissing()
     }
 
     override fun processOpts() {
@@ -241,21 +243,18 @@ class JavaFeignGenerator : ExtendableJavaCodegenBase(), CodegenConfig, PrimeCode
             targetDirectory = outputFolder,
             targetFileName = "gradle/wrapper/gradle-wrapper.properties",
             scope = TemplateScope.SUPPORT,
-            overwrite = false,
         ))
         cfg.templateSpecs.add(PrimeTemplateSpec(
             sourceTemplate = "gradle/gradlew.peb",
             targetDirectory = outputFolder,
             targetFileName = "gradlew",
             scope = TemplateScope.SUPPORT,
-            overwrite = false,
         ))
         cfg.templateSpecs.add(PrimeTemplateSpec(
             sourceTemplate = "gradle/gradlew.bat.peb",
             targetDirectory = outputFolder,
             targetFileName = "gradlew.bat",
             scope = TemplateScope.SUPPORT,
-            overwrite = false,
         ))
         cfg.templateSpecs.add(PrimeTemplateSpec(
             sourceTemplate = "support/gitignore.peb",

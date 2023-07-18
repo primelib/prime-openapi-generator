@@ -1,3 +1,4 @@
+{# @pebvariable name="t" type="io.github.primelib.primecodegen.core.domain.template.NitroGeneratorData" #}
 plugins {
     `java-library`
     id("me.philippheuer.configuration") version "0.10.6"
@@ -8,12 +9,54 @@ val version: String = properties["version"] as? String ?: "0.0.0"
 projectConfiguration {
     type.set(me.philippheuer.projectcfg.domain.ProjectType.LIBRARY)
     javaVersion.set(JavaVersion.VERSION_17)
+{% if t.project.artifactGroupId is not empty %}
+    artifactGroupId.set("{{ t.project.artifactGroupId }}")
+    artifactId.set("{{ t.project.artifactId }}")
+    artifactDisplayName.set("{{ t.project.name }}")
+    artifactDescription.set("{{ t.project.description }}")
+
+    pom = { pom ->
+        pom.url.set("https://{{ t.project.repository }}")
+        pom.issueManagement {
+            system.set("GitHub")
+            url.set("https://{{ t.project.repository }}/issues")
+        }
+{% if t.project.inceptionYear is not empty %}
+        pom.inceptionYear.set("{{ t.project.inceptionYear }}")
+{% endif %}
+{% if t.project.maintainerId is not empty %}
+        pom.developers {
+            developer {
+                id.set("{{ t.project.maintainerId }}")
+                name.set("{{ t.project.maintainerName }}")
+                email.set("{{ t.project.maintainerEMail }}")
+                roles.addAll("maintainer")
+            }
+        }
+{% endif %}
+{% if t.project.licenseName is not empty and t.project.licenseUrl is not empty %}
+        pom.licenses {
+            license {
+                name.set("{{ t.project.licenseName }}")
+                distribution.set("repo")
+                url.set("{{ t.project.licenseUrl }}")
+            }
+        }
+{% endif %}
+        pom.scm {
+            connection.set("scm:git:git://{{ t.project.repository }}.git")
+            developerConnection.set("scm:git:git://{{ t.project.repository }}.git")
+            url.set("https://{{ t.project.repository }}")
+        }
+    }
+{% endif %}
 }
 
 dependencies {
     // bom
     api(platform("io.github.openfeign:feign-bom:12.4"))
     api(platform("io.github.resilience4j:resilience4j-bom:2.1.0"))
+    api(platform("com.fasterxml.jackson:jackson-bom:2.15.2"))
 
     // annotations
     implementation("org.jetbrains:annotations:24.0.1")
@@ -24,6 +67,9 @@ dependencies {
     implementation("io.github.openfeign:feign-slf4j")
     implementation("io.github.openfeign:feign-okhttp")
     implementation("io.github.openfeign:feign-micrometer")
+{% if t.details.hasFormParameters %}
+    implementation("io.github.openfeign.form:feign-form:3.8.0")
+{% endif %}
 
     // resilience4J
     implementation("io.github.resilience4j:resilience4j-feign")
@@ -32,6 +78,10 @@ dependencies {
     implementation("io.github.resilience4j:resilience4j-circuitbreaker")
     implementation("io.github.resilience4j:resilience4j-ratelimiter")
     implementation("io.github.resilience4j:resilience4j-micrometer")
+
+    // jackson
+    implementation("com.fasterxml.jackson.core:jackson-databind")
+    implementation("com.fasterxml.jackson.module:jackson-module-blackbird")
 
     // metrics
     implementation("io.micrometer:micrometer-core:1.11.1")

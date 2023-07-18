@@ -7,13 +7,19 @@ package {{ t.additionalProperties.get("invokerPackage") }};
 import {{ t.apiPackage }}.{{ t.mainClassName }}Api;
 import {{ t.additionalProperties.get("authPackage") }}.AuthMethod;
 import {{ t.additionalProperties.get("authPackage") }}.AuthInterceptor;
+
+import com.fasterxml.jackson.module.blackbird.BlackbirdModule;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 
 import feign.Feign;
+{% if t.details.hasFormParameters %}
+import feign.form.FormEncoder;
+{% endif %}
 import feign.Logger;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
@@ -51,9 +57,12 @@ import java.util.function.Consumer;
 @Generated(value = "{{ t.generatorClass }}"{% if not cfg.hideGenerationTimestamp %}, date = "{{ t.generatorDate }}"{% endif %})
 public class {{ t.mainClassName }}Factory {
     private static final ObjectMapper MAPPER = JsonMapper.builder()
+            .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
+            .enable(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE)
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             .propertyNamingStrategy(PropertyNamingStrategies.LOWER_CAMEL_CASE)
             .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
+            .addModule(new BlackbirdModule())
             .build();
 
     public static <T> T create(Consumer<{{ t.mainClassName }}FactorySpec<T>> spec) {
@@ -68,8 +77,8 @@ public class {{ t.mainClassName }}Factory {
                     s.applySpec(config);
                 });
                 return config.api().getConstructor({{ t.mainClassName }}Api.class).newInstance(api);
-            } catch (Exception e) {
-                throw new IllegalArgumentException("api must have a constructor with one parameter of type {{ t.mainClassName }}Api");
+            } catch (Exception ex) {
+                throw new IllegalArgumentException("api must have a constructor with one parameter of type {{ t.mainClassName }}Api", ex);
             }
         }
     }
@@ -104,7 +113,11 @@ public class {{ t.mainClassName }}Factory {
         // builder
         return Resilience4jFeign.builder(decorators)
                 .client(new OkHttpClient())
+{% if t.details.hasFormParameters %}
+                .encoder(new FormEncoder(new JacksonEncoder(MAPPER)))
+{% else %}
                 .encoder(new JacksonEncoder(MAPPER))
+{% endif %}
                 .decoder(new JacksonDecoder(MAPPER))
                 .logger(new Slf4jLogger())
                 .logLevel(Logger.Level.NONE)

@@ -2,14 +2,14 @@
 {# @pebvariable name="cfg" type="io.github.primelib.primecodegen.javafeign.config.JavaFeignGeneratorConfig" #}
 {% if not cfg.hideLicense %}
 /*
- * {{ t.appName }}{{ newline() }}
+ * {{ t.details.appName }}{{ newline() }}
  *
-{{ t.appDescription | lineprefix(" * ") }}
+{{ t.details.appDescription | lineprefix(" * ") }}
  *
-{% if t.appVersion is not empty %} * The version of the OpenAPI document: {{ t.appVersion }}{{ newline() }}{% endif %}
-{% if t.infoEmail is not empty %} * Contact: {{ t.infoEmail }}{{ newline() }}{% endif %}
+{% if t.details.appVersion is not empty %} * The version of the OpenAPI document: {{ t.details.appVersion }}{{ newline() }}{% endif %}
+{% if t.details.infoEmail is not empty %} * Contact: {{ t.details.infoEmail }}{{ newline() }}{% endif %}
  *
- * License: [{{ t.licenseUrl }}]({{ t.licenseName }})
+ * License: [{{ t.details.licenseUrl }}]({{ t.details.licenseName }})
  *
  * NOTE: This class is auto generated.
  * Generator: {{ t.generatorClass }} - {{ t.generatorVersion }}{{ newline() }}

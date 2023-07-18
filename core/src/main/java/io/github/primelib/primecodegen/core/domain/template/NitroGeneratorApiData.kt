@@ -8,7 +8,8 @@ data class NitroGeneratorApiData(
     val packageName: String,
     val classname: String,
     val imports: MutableList<NitroGeneratorImport>,
-    val operations: MutableList<CodegenOperation>
+    val operations: MutableList<CodegenOperation>,
+    val primeOperations: MutableList<NitroGeneratorOperationData> = mutableListOf(),
 ) {
     companion object {
         fun of(api: MutableMap<String, Any>, config: CodegenConfig): NitroGeneratorApiData {
@@ -18,7 +19,8 @@ data class NitroGeneratorApiData(
                 packageName = api["package"] as String,
                 classname = apiData["classname"] as String,
                 imports = NitroGeneratorImport.ofList(api["imports"] as MutableList<Map<String, Any>>),
-                operations = apiData["operation"] as MutableList<CodegenOperation>
+                operations = apiData["operation"] as MutableList<CodegenOperation>,
+                primeOperations = NitroGeneratorOperationData.ofList(apiData["operation"] as MutableList<CodegenOperation>, config).toMutableList(),
             )
         }
 
@@ -32,6 +34,7 @@ data class NitroGeneratorApiData(
         "packageName" to packageName,
         "classname" to classname,
         "imports" to imports,
-        "operations" to operations
+        "operations" to operations,
+        "primeOperations" to primeOperations,
     )
 }

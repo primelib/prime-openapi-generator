@@ -46,30 +46,10 @@ data class NitroGeneratorData(
     var additionalProperties: MutableMap<String, Any> = mutableMapOf(),
 
     /**
-     * OpenAPI Info - Name
-     */
-    var appName: String? = null,
-
-    /**
-     * OpenAPI Info - Version
-     */
-    var appVersion: String? = null,
-
-    /**
-     * OpenAPI Info - Description
-     */
-    var appDescription: String? = null,
-    var infoEmail: String? = null,
-    var infoName: String? = null,
-    var infoUrl: String? = null,
-    var licenseInfo: String? = null,
-    var licenseUrl: String? = null,
-    var licenseName: String? = null,
-    var termsOfService: String? = null,
-
-    /**
      * OpenAPI - Processed Data
      */
+    var details: OpenAPIDetails? = null,
+    var project: ProjectData? = null,
     var model: NitroGeneratorModelData? = null,
     var models: MutableList<NitroGeneratorModelData> = mutableListOf(),
     var operation: NitroGeneratorOperationData? = null,
@@ -107,16 +87,8 @@ data class NitroGeneratorData(
             "testPackage" to testPackage,
             "mainClassName" to mainClassName,
             "additionalProperties" to additionalProperties,
-            "appName" to appName,
-            "appVersion" to appVersion,
-            "appDescription" to appDescription,
-            "infoEmail" to infoEmail,
-            "infoName" to infoName,
-            "infoUrl" to infoUrl,
-            "licenseInfo" to licenseInfo,
-            "licenseUrl" to licenseUrl,
-            "licenseName" to licenseName,
-            "termsOfService" to termsOfService,
+            "details" to details,
+            "project" to project,
             "model" to model,
             "models" to models,
             "operation" to operation,
@@ -134,6 +106,8 @@ data class NitroGeneratorData(
     fun getCopy(): NitroGeneratorData {
         return copy(
             additionalProperties = additionalProperties.toMutableMap(),
+            details = details?.copy(),
+            project = project?.copy(),
             model = model?.copy(),
             models = models.map { it.copy() }.toMutableList(),
             operation = operation?.copy(),
