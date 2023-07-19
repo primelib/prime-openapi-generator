@@ -1,12 +1,13 @@
 plugins {
     `java-library`
-    id("me.philippheuer.configuration") version "0.10.5"
+    id("me.philippheuer.configuration") version "0.10.7"
 }
 
 allprojects {
     apply(plugin = "java-library")
     apply(plugin = "me.philippheuer.configuration")
     apply(plugin = "io.freefair.lombok")
+    apply(plugin = "org.jetbrains.kotlin.jvm")
 
     projectConfiguration {
         type.set(me.philippheuer.projectcfg.domain.ProjectType.LIBRARY)

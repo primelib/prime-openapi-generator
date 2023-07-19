@@ -120,7 +120,7 @@ public class {{ t.mainClassName }}Factory {
 {% endif %}
                 .decoder(new JacksonDecoder(MAPPER))
                 .logger(new Slf4jLogger())
-                .logLevel(Logger.Level.NONE)
+                .logLevel(Logger.Level.valueOf(config.logLevel().toUpperCase()))
                 .addCapability(new MicrometerCapability(config.meterRegistry()))
                 .requestInterceptor(new AuthInterceptor(config.auth()))
                 .target(config.api(), config.baseUrl());

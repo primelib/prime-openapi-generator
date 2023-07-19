@@ -11,11 +11,10 @@ import io.github.primelib.primecodegen.core.domain.template.NitroGeneratorApiDat
 import io.github.primelib.primecodegen.core.domain.template.NitroGeneratorData;
 import io.github.primelib.primecodegen.core.domain.template.NitroGeneratorModelData;
 import io.github.primelib.primecodegen.core.domain.template.NitroGeneratorOperationData;
+import io.github.primelib.primecodegen.core.domain.template.OpenAPIDetails;
+import io.github.primelib.primecodegen.core.domain.template.ProjectData;
 import io.swagger.v3.core.util.Json;
 import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.info.Contact;
-import io.swagger.v3.oas.models.info.Info;
-import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.media.Schema;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
