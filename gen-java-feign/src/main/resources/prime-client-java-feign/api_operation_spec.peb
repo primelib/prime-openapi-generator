@@ -37,7 +37,7 @@ public class {{ t.operation.classname }}OperationSpec {
 {{ javadocDescription("     * ", param.description) }}
      */
     {% include "./param_annotation.peb" %}{{ newline() }}
-    private {{ param.dataType }} {{ param.paramName }}{% if param.defaultValue is not empty %} = {% if param.isString %}"{% endif %}{{ param.defaultValue }}{% if param.isString %}"{% endif %}{% endif %};{{ newline() }}
+    private {{ param.dataType }} {{ param.paramName }}{% if param.defaultValue is not empty %} = {% if param.isString %}"{% endif %}{{ param.defaultValue }}{% if param.isString %}"{% endif %}{% if param.isLong %}L{% endif %}{% endif %};{{ newline() }}
 
 {% endif %}
 {% endfor %}

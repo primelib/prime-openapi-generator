@@ -26,6 +26,9 @@ data class AuthTemplateData(
                 if (schema.type == SecurityScheme.Type.HTTP && schema.scheme == "bearer") {
                     response.hasBearer = true
                 }
+                if ((schema.type == SecurityScheme.Type.OAUTH2 || schema.type == SecurityScheme.Type.OPENIDCONNECT)) {
+                    response.hasBearer = true
+                }
             }
 
             return response

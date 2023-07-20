@@ -61,6 +61,11 @@ abstract class ExtendableJavaCodegenBase : AbstractJavaCodegen(), CodegenConfig,
         model.imports.remove("ApiModelProperty")
         model.imports.remove("ApiModel")
 
+        // support to overwrite the name via x-alias
+        model.vars.filter { p -> p.vendorExtensions.containsKey("x-alias") }.forEach { p ->
+            p.name = p.vendorExtensions["x-alias"].toString()
+        }
+
         // container inner type for enums
         if (model.isEnum) {
             val matchResult = containerInnerTypePattern.matchEntire(model.dataType)

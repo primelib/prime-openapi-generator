@@ -1,5 +1,6 @@
 {# @pebvariable name="model" type="io.github.primelib.primecodegen.core.domain.template.NitroGeneratorModelData" #}
 {# @pebvariable name="cfg" type="io.github.primelib.primecodegen.javafeign.config.JavaFeignGeneratorConfig" #}
+{# @pebvariable name="var" type="org.openapitools.codegen.CodegenProperty" #}
 /**
  * {% if model.title is empty %}{{ model.classname }}{% else %}{{ model.title }}{% endif %}{{ newline() }}
 {% if model.description is not empty %}
