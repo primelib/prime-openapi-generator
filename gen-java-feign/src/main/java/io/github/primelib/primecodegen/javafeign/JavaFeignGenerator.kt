@@ -87,6 +87,14 @@ class JavaFeignGenerator : ExtendableJavaCodegenBase(), CodegenConfig, PrimeCode
             scope = TemplateScope.API,
             iterator = TemplateIterator.ONCE_API,
         ))
+        cfg.templateSpecs.add(PrimeTemplateSpec(
+            description = "proxy spec",
+            sourceTemplate = "proxy/proxySpec.peb",
+            targetDirectory = invokerFolder,
+            targetFileName = "{mainClassName}ProxySpec.java",
+            scope = TemplateScope.API,
+            iterator = TemplateIterator.ONCE_API,
+        ))
 
         // api
         cfg.templateSpecs.add(PrimeTemplateSpec(

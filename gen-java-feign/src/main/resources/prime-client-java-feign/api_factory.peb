@@ -28,6 +28,7 @@ import feign.okhttp.OkHttpClient;
 import feign.reactive.ReactorFeign;
 import feign.reactive.RxJavaFeign;
 import feign.slf4j.Slf4jLogger;
+import okhttp3.Credentials;
 
 import io.github.resilience4j.bulkhead.BulkheadRegistry;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
@@ -49,7 +50,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.lang.reflect.Method;
-
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.util.function.Consumer;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
@@ -110,9 +112,22 @@ public class {{ t.mainClassName }}Factory {
         TaggedCircuitBreakerMetrics.ofCircuitBreakerRegistry(circuitBreakerRegistry).bindTo(config.meterRegistry());
         TaggedRetryMetrics.ofRetryRegistry(retryRegistry).bindTo(config.meterRegistry());
 
+        // http client
+        okhttp3.OkHttpClient.Builder clientBuilder = new okhttp3.OkHttpClient.Builder();
+        if (config.proxy() != null && config.proxy().type() != Proxy.Type.DIRECT) {
+            clientBuilder.proxy(new Proxy(config.proxy().type(), new InetSocketAddress(config.proxy().host(), config.proxy().port())));
+            if (config.proxy().username() != null || config.proxy().password() != null) {
+                clientBuilder.proxyAuthenticator((route, response) -> {
+                    return response.request().newBuilder()
+                            .header("Proxy-Authorization", Credentials.basic(config.proxy().username(), new String(config.proxy().password())))
+                            .build();
+                });
+            }
+        }
+
         // builder
         return Resilience4jFeign.builder(decorators)
-                .client(new OkHttpClient())
+                .client(new OkHttpClient(clientBuilder.build()))
 {% if t.details.hasFormParameters %}
                 .encoder(new FormEncoder(new JacksonEncoder(MAPPER)))
 {% else %}
