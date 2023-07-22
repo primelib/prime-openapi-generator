@@ -1,3 +1,4 @@
+{# @pebvariable name="t" type="io.github.primelib.primecodegen.core.domain.template.NitroGeneratorData" #}
 {# @pebvariable name="model" type="io.github.primelib.primecodegen.core.domain.template.NitroGeneratorModelData" #}
 {# @pebvariable name="cfg" type="io.github.primelib.primecodegen.javafeign.config.JavaFeignGeneratorConfig" #}
 {# @pebvariable name="var" type="org.openapitools.codegen.CodegenProperty" #}
@@ -10,14 +11,20 @@
  *
 {% if model.isDeprecated %} * @deprecated{% if model.vendorExtensions['x-deprecated'] is not empty %} {{ model.vendorExtensions['x-deprecated'] }}{% endif %}{{ newline() }}{% endif %}
  */
-@Data
-{% if model.codegenModel.vars is not empty %}
-@AllArgsConstructor
-{% endif %}
-@Accessors(fluent = true)
-@NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
+@Getter
+@Setter
 {% if model.codegenModel.parent is not empty %}
 @EqualsAndHashCode(callSuper = true)
+{% else %}
+@EqualsAndHashCode
+{% endif %}
+@ToString
+@Accessors(fluent = true, chain = true)
+{% if model.codegenModel.vars is not empty %}
+@NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
+{% endif %}
+{% if model.codegenModel.parent is empty %}
+@Builder
 {% endif %}
 {% if model.codegenModel.vars is not empty %}
 @JsonPropertyOrder({
@@ -31,16 +38,6 @@
 @Generated(value = "{{ t.generatorClass }}"{% if not cfg.hideGenerationTimestamp %}, date = "{{ t.generatorDate }}"{% endif %})
 public class {{ model.classname }}{% if model.codegenModel.parent is not empty %} extends {{ model.codegenModel.parent }}{% endif %} {
 
-    /**
-     * Constructs a validated implementation of {@link {{ model.classname}}}.
-     *
-     * @param spec the specification to process
-     */
-    @ApiStatus.Internal
-    public {{ model.classname }}(Consumer<{{ model.classname }}> spec) {
-        spec.accept(this);
-    }
-
 {% for var in model.codegenModel.vars %}
 {% if var.description is not empty %}
     /**
@@ -48,9 +45,35 @@ public class {{ model.classname }}{% if model.codegenModel.parent is not empty %
      */
 {% endif %}
     @JsonProperty("{{ var.baseName }}")
-    protected {{ var.datatypeWithEnum }} {{ var.name }}{% if var.defaultValue is not empty %} = {{ var.defaultValue }}{% endif %};
+    protected {{ var.datatypeWithEnum }} {{ var.name }};
 
 {% endfor %}
+    /**
+     * Constructs a validated instance of {@link {{ model.classname}}}.
+     *
+     * @param spec the specification to process
+     */
+    public {{ model.classname }}(Consumer<{{ model.classname }}> spec) {
+{% if model.codegenModel.parent is not empty %}
+        super();
+{% endif %}
+        spec.accept(this);
+    }
+
+    /**
+     * Constructs a validated instance of {@link {{ model.classname }}}.
+     * <p>
+     * NOTE: This constructor is not considered stable and may change if the model is updated. Consider using {@link #{{ model.classname }}(Consumer)} instead.
+{% for var in model.codegenModel.vars %}
+     * @param {{ var.name }} {% if var.description is not empty %}{{ javadocDescriptionInline(var.description) }}{% else %}var.name{% endif %}{{ newline() }}
+{% endfor %}
+     */
+    @ApiStatus.Internal
+    public {{ model.classname }}({% for var in model.codegenModel.vars %}{{ var.datatypeWithEnum }} {{ var.name }}{% if not loop.last %}, {% endif %}{% endfor %}) {
+{% for var in model.codegenModel.vars %}
+        this.{{ var.name }} = {{ var.name }};
+{% endfor %}
+    }
 
 {% for var in model.codegenModel.vars %}
 {% if var.isEnum %}

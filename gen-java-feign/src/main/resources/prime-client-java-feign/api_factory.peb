@@ -8,6 +8,7 @@ import {{ t.apiPackage }}.{{ t.mainClassName }}Api;
 import {{ t.additionalProperties.get("authPackage") }}.AuthMethod;
 import {{ t.additionalProperties.get("authPackage") }}.AuthInterceptor;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.module.blackbird.BlackbirdModule;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
@@ -15,6 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import feign.Feign;
 {% if t.details.hasFormParameters %}
@@ -64,6 +66,10 @@ public class {{ t.mainClassName }}Factory {
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             .propertyNamingStrategy(PropertyNamingStrategies.LOWER_CAMEL_CASE)
             .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
+{% if t.additionalProperties.getOrDefault("jsonIncludeNonNull", false) == true %}
+            .serializationInclusion(JsonInclude.Include.NON_NULL)
+{% endif %}
+            .addModule(new JavaTimeModule())
             .addModule(new BlackbirdModule())
             .build();
 

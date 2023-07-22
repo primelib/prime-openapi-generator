@@ -16,12 +16,17 @@ class JavadocDescriptionInlineFunction : Function {
         context: EvaluationContext,
         lineNumber: Int
     ): Any? {
-        val summary = args["summary"] as? String
+        var summary = args["summary"] as? String
         if (StringUtils.isEmpty(summary)) {
             return ""
         }
 
-        return summary!!.replace("```", "\"")
+        return summary!!.replace(Regex("""\`(.*?)\`""")) { matchResult ->
+                            "{@code ${matchResult.groupValues[1]}}"
+                        }
+                        .replace(Regex("""\`\`\`(.*?)\`\`\`""")) { matchResult ->
+                            "<pre>${matchResult.groupValues[1]}</pre>"
+                        }
                         .replace("\\\"", "\"")
                         .replace("<", "&lt;")
                         .replace(">", "&gt;")

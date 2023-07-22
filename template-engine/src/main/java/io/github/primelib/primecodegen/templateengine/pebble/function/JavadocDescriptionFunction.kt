@@ -26,7 +26,12 @@ class JavadocDescriptionFunction : Function {
         val lines = summary!!.split("\\s{2}".toRegex())
         return StringBuilder().apply {
             lines.map { line ->
-                line.replace("```", "\"")
+                line.replace(Regex("""\`(.*?)\`""")) { matchResult ->
+                        "{@code ${matchResult.groupValues[1]}}"
+                    }
+                    .replace(Regex("""\`\`\`(.*?)\`\`\`""")) { matchResult ->
+                        "<pre>${matchResult.groupValues[1]}</pre>"
+                    }
                     .replace("\\\"", "\"")
                     .replace("<", "&lt;")
                     .replace(">", "&gt;")

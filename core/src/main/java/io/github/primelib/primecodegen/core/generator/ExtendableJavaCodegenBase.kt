@@ -41,6 +41,8 @@ abstract class ExtendableJavaCodegenBase : AbstractJavaCodegen(), CodegenConfig,
 
         // clear reserved words not used by our generator
         reservedWords.removeAll(setOf("ApiClient", "ApiException", "ApiResponse", "Configuration", "StringUtil"))
+        reservedWords.remove("object")
+        reservedWords.remove("configuration")
     }
 
     override fun processOpts() {

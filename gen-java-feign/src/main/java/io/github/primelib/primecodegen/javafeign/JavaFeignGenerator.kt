@@ -107,7 +107,7 @@ class JavaFeignGenerator : ExtendableJavaCodegenBase(), CodegenConfig, PrimeCode
         ))
         cfg.templateSpecs.add(PrimeTemplateSpec(
             description = "consumer spec variant of the primary api interface",
-            sourceTemplate = "api_mainspec.peb",
+            sourceTemplate = "api_spec.peb",
             targetDirectory = apiFolder,
             targetFileName = "{mainClassName}ConsumerApi.java",
             scope = TemplateScope.API,
@@ -190,6 +190,7 @@ class JavaFeignGenerator : ExtendableJavaCodegenBase(), CodegenConfig, PrimeCode
             targetFileName = "{name}OperationSpec.java",
             scope = TemplateScope.MODEL,
             iterator = TemplateIterator.EACH_API_OPERATION,
+            filter = { data -> data.operation?.allNonStaticParams?.isNotEmpty() ?: false }
         ))
 
         // auth files

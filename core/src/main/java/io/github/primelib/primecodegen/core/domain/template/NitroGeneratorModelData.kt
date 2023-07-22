@@ -14,7 +14,7 @@ data class NitroGeneratorModelData(
     val isEnum: Boolean?,
     var isDeprecated: Boolean?,
     var vendorExtensions: Map<String, Any>?,
-    var codegenModel: CodegenModel?
+    var codegenModel: CodegenModel?,
 ) {
     companion object {
         fun of(data: Map<String, Any>, config: CodegenConfig): NitroGeneratorModelData {
@@ -28,7 +28,7 @@ data class NitroGeneratorModelData(
                 isEnum = data["isEnum"] as? Boolean,
                 isDeprecated = null,
                 vendorExtensions = null,
-                codegenModel = null
+                codegenModel = null,
             )
 
             val models = data["models"] as? List<Map<String, Any>>

@@ -6,8 +6,13 @@ package {{ t.additionalProperties.get("specPackage") }};
 
 {% include "./import.peb" with {"cfg": cfg, "imports": t.api.imports} %}
 import lombok.AccessLevel;
-import lombok.Data;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.experimental.Accessors;
 import java.util.function.Consumer;
 
@@ -20,9 +25,13 @@ import java.util.function.Consumer;
 {{ javadocDescription(" * ", t.operation.codegenOperation.summary) }}
 {% endif %}
  */
-@Data
-@Accessors(fluent = true)
-@NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
+@Getter
+@Setter
+@EqualsAndHashCode
+@ToString
+@Accessors(fluent = true, chain = true)
+@NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
+@Builder
 @Generated(value = "{{ t.generatorClass }}"{% if not cfg.hideGenerationTimestamp %}, date = "{{ t.generatorDate }}"{% endif %})
 public class {{ t.operation.classname }}OperationSpec {
     /**
@@ -31,24 +40,40 @@ public class {{ t.operation.classname }}OperationSpec {
     @ApiStatus.Experimental
     public static Boolean VALIDATION_ENABLED = true;
 
-{% for param in t.operation.codegenOperation.allParams %}
-{% if not param.vendorExtensions.getOrDefault("x-param-static", false) %}
+{% for param in t.operation.allNonStaticParams %}
     /**
 {{ javadocDescription("     * ", param.description) }}
      */
     {% include "./param_annotation.peb" %}{{ newline() }}
-    private {{ param.dataType }} {{ param.paramName }}{% if param.defaultValue is not empty %} = {% if param.isString %}"{% endif %}{{ param.defaultValue }}{% if param.isString %}"{% endif %}{% if param.isLong %}L{% endif %}{% endif %};{{ newline() }}
+    private {{ param.dataType }} {{ param.paramName }};{{ newline() }}
 
-{% endif %}
 {% endfor %}
     /**
-     * Constructs a validated implementation of {@link {{ t.operation.classname }}OperationSpec}.
+     * Constructs a validated instance of {@link {{ t.operation.classname }}OperationSpec}.
      *
      * @param spec the specification to process
      */
     @ApiStatus.Internal
     public {{ t.operation.classname }}OperationSpec(Consumer<{{ t.operation.classname }}OperationSpec> spec) {
         spec.accept(this);
+        if (VALIDATION_ENABLED)
+            validate();
+    }
+
+    /**
+     * Constructs a validated instance of {@link {{ t.operation.classname }}OperationSpec}.
+     * <p>
+     * NOTE: This constructor is not considered stable and may change if the operation is updated.
+{% for param in t.operation.allNonStaticParams %}
+     * @param {{ param.paramName | padright(20) }} {{ javadocDescriptionInline(param.description) }}{{ newline() }}
+{% endfor %}
+     */
+    @ApiStatus.Internal
+    public {{ t.operation.classname }}OperationSpec({% for param in t.operation.allNonStaticParams %}{{ param.dataType }} {{ param.paramName }}{% if not loop.last %}, {% endif %}{% endfor %}) {
+{% for param in t.operation.allNonStaticParams %}
+        this.{{ param.paramName }} = {{ param.paramName }};
+{% endfor %}
+
         if (VALIDATION_ENABLED)
             validate();
     }
@@ -65,5 +90,4 @@ public class {{ t.operation.classname }}OperationSpec {
 {% endif %}
 {% endfor %}
     }
-
 }
