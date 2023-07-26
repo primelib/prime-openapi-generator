@@ -5,7 +5,6 @@ package {{ t.additionalProperties.get("invokerPackage") }};
 
 {% include "./import.peb" with {"t": t, "imports": t.api.imports} %}
 import {{ t.apiPackage }}.{{ t.mainClassName }}Api;
-import {{ t.additionalProperties.get("authPackage") }}.AuthMethod;
 import {{ t.additionalProperties.get("authPackage") }}.ApiKeyAuthSpec;
 import {{ t.additionalProperties.get("authPackage") }}.BasicAuthSpec;
 import {{ t.additionalProperties.get("authPackage") }}.BearerAuthSpec;
@@ -17,6 +16,9 @@ import lombok.experimental.Accessors;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
+
+import io.github.primelib.primecodegenlib.java.feign.common.api.AuthMethod;
+import io.github.primelib.primecodegenlib.java.feign.common.config.ProxySpec;
 
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -59,10 +61,10 @@ public final class {{ t.mainClassName }}FactorySpec<T> {
      * The proxy server to use, if applicable
      * <p>
      * Defaults to {@code null}.
-     * Set to {@code {{ t.mainClassName }}ProxySpec.detect()} to detect the proxy based on the os environment automatically.
+     * Set to {@code ProxySpec.detect()} to detect the proxy based on the os environment automatically.
      */
     @Nullable
-    private {{ t.mainClassName }}ProxySpec proxy = null;
+    private ProxySpec proxy = null;
 
     /**
      * MeterRegistry to use for metrics
@@ -105,8 +107,8 @@ public final class {{ t.mainClassName }}FactorySpec<T> {
         Objects.requireNonNull(logLevel, "logLevel must not be null");
     }
 
-    public {{ t.mainClassName }}ProxySpec httpProxy(Consumer<{{ t.mainClassName }}ProxySpec> proxySpec) {
-        {{ t.mainClassName }}ProxySpec proxy = new {{ t.mainClassName }}ProxySpec(proxySpec);
+    public ProxySpec httpProxy(Consumer<ProxySpec> proxySpec) {
+        ProxySpec proxy = new ProxySpec(proxySpec);
         proxy(proxy);
         return proxy;
     }

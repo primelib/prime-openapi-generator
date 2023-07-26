@@ -34,7 +34,7 @@ public interface {{ t.mainClassName }}Api {
 {% if operation.vendorExtensions.get("x-stability") == "experimental" %}
     @ApiStatus.Experimental
 {% endif %}
-    {% if operation.returnType is not empty %}{{ operation.returnType | formatString(t.additionalProperties.getOrDefault("primeWrapReturnType", "%s")) }}{% else %}void{% endif %} {{ operation.nickname }}({% for param in primeOperation.allNonStaticParams %}{% if not param.vendorExtensions.getOrDefault("x-param-static", false) %}{% if param.isHeaderParam or param.isPathParam or param.isQueryParam or param.isFormParam %}@Param("{{ param.vendorExtensions.getOrDefault("x-base-name", param.baseName) }}") {% endif %}{% include "./param_annotation.peb" %}{{ param.dataType }} {{ param.paramName }}{% if not loop.last %}, {% endif %}{% endif %}{% endfor %});
+    {{ primeOperation.returnType }} {{ operation.nickname }}({% for param in primeOperation.allNonStaticParams %}{% if not param.vendorExtensions.getOrDefault("x-param-static", false) %}{% if param.isHeaderParam or param.isPathParam or param.isQueryParam or param.isFormParam %}@Param("{{ param.vendorExtensions.getOrDefault("x-base-name", param.baseName) }}") {% endif %}{% include "./param_annotation.peb" %}{{ param.dataType }} {{ param.paramName }}{% if not loop.last %}, {% endif %}{% endif %}{% endfor %});
 
 {% endfor %}
 }

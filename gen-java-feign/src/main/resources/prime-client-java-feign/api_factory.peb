@@ -5,8 +5,6 @@ package {{ t.additionalProperties.get("invokerPackage") }};
 
 {% include "./import.peb" with {"t": t, "imports": t.api.imports} %}
 import {{ t.apiPackage }}.{{ t.mainClassName }}Api;
-import {{ t.additionalProperties.get("authPackage") }}.AuthMethod;
-import {{ t.additionalProperties.get("authPackage") }}.AuthInterceptor;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.module.blackbird.BlackbirdModule;
@@ -42,6 +40,9 @@ import io.github.resilience4j.micrometer.tagged.TaggedRateLimiterMetrics;
 import io.github.resilience4j.micrometer.tagged.TaggedRetryMetrics;
 import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
 import io.github.resilience4j.retry.RetryRegistry;
+
+import io.github.primelib.primecodegenlib.java.feign.common.interceptor.AuthInterceptor;
+import io.github.primelib.primecodegenlib.java.feign.resilience4j.Resilience4JCapability;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -132,7 +133,7 @@ public class {{ t.mainClassName }}Factory {
         }
 
         // builder
-        return Resilience4jFeign.builder(decorators)
+        return Feign.builder()
                 .client(new OkHttpClient(clientBuilder.build()))
 {% if t.details.hasFormParameters %}
                 .encoder(new FormEncoder(new JacksonEncoder(MAPPER)))
@@ -143,6 +144,7 @@ public class {{ t.mainClassName }}Factory {
                 .logger(new Slf4jLogger())
                 .logLevel(Logger.Level.valueOf(config.logLevel().toUpperCase()))
                 .addCapability(new MicrometerCapability(config.meterRegistry()))
+                .addCapability(new Resilience4JCapability(decorators))
                 .requestInterceptor(new AuthInterceptor(config.auth()))
                 .target(config.api(), config.baseUrl());
     }

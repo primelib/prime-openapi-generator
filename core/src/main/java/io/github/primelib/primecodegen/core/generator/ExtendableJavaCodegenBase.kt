@@ -94,6 +94,14 @@ abstract class ExtendableJavaCodegenBase : AbstractJavaCodegen(), CodegenConfig,
     override fun postProcessOperationsWithModels(objs: OperationsMap, allModels: MutableList<ModelMap>): OperationsMap {
         val modifiedObjs = super.postProcessOperationsWithModels(objs, allModels)
         modifiedObjs.preprocessOperations()
+
+        // set void as return type, if returnType is null
+        modifiedObjs.operations.operation.forEach { operation ->
+            if (operation.returnType == null) {
+                operation.returnType = "void"
+            }
+        }
+
         return modifiedObjs
     }
 

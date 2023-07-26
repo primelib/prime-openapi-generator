@@ -5,6 +5,7 @@ import io.github.primelib.primecodegen.core.api.PrimeCodegenConfig
 import io.github.primelib.primecodegen.core.domain.config.PrimeTemplateSpec
 import io.github.primelib.primecodegen.core.domain.config.TemplateIterator
 import io.github.primelib.primecodegen.core.domain.config.TemplateScope
+import io.github.primelib.primecodegen.core.domain.template.NitroGeneratorImport
 import io.github.primelib.primecodegen.core.extensions.appendAcceptHeaderIfMissing
 import io.github.primelib.primecodegen.core.extensions.appendContentTypeHeaderIfMissing
 import io.github.primelib.primecodegen.core.extensions.fixParamArrayType
@@ -87,14 +88,6 @@ class JavaFeignGenerator : ExtendableJavaCodegenBase(), CodegenConfig, PrimeCode
             scope = TemplateScope.API,
             iterator = TemplateIterator.ONCE_API,
         ))
-        cfg.templateSpecs.add(PrimeTemplateSpec(
-            description = "proxy spec",
-            sourceTemplate = "proxy/proxySpec.peb",
-            targetDirectory = invokerFolder,
-            targetFileName = "{mainClassName}ProxySpec.java",
-            scope = TemplateScope.API,
-            iterator = TemplateIterator.ONCE_API,
-        ))
 
         // api
         cfg.templateSpecs.add(PrimeTemplateSpec(
@@ -112,6 +105,44 @@ class JavaFeignGenerator : ExtendableJavaCodegenBase(), CodegenConfig, PrimeCode
             targetFileName = "{mainClassName}ConsumerApi.java",
             scope = TemplateScope.API,
             iterator = TemplateIterator.EACH_API,
+        ))
+
+        // async api
+        cfg.templateSpecs.add(PrimeTemplateSpec(
+            sourceTemplate = "api_main.peb",
+            targetDirectory = apiFolder,
+            targetFileName = "{mainClassName}AsyncApi.java",
+            scope = TemplateScope.API,
+            iterator = TemplateIterator.EACH_API,
+            transform = { data ->
+                data.mainClassName = "${data.mainClassName}Async"
+                data.api?.imports?.add(NitroGeneratorImport("java.util.concurrent.CompletableFuture"))
+                data.api?.primeOperations?.forEach { operation ->
+                    if (operation.returnType == "void") {
+                        operation.returnType = "CompletableFuture<Void>"
+                    } else {
+                        operation.returnType = "CompletableFuture<${operation.returnType}>"
+                    }
+                }
+            }
+        ))
+        cfg.templateSpecs.add(PrimeTemplateSpec(
+            sourceTemplate = "api_spec.peb",
+            targetDirectory = apiFolder,
+            targetFileName = "{mainClassName}AsyncConsumerApi.java",
+            scope = TemplateScope.API,
+            iterator = TemplateIterator.EACH_API,
+            transform = { data ->
+                data.mainClassName = "${data.mainClassName}Async"
+                data.api?.imports?.add(NitroGeneratorImport("java.util.concurrent.CompletableFuture"))
+                data.api?.primeOperations?.forEach { operation ->
+                    if (operation.returnType == "void") {
+                        operation.returnType = "CompletableFuture<Void>"
+                    } else {
+                        operation.returnType = "CompletableFuture<${operation.returnType}>"
+                    }
+                }
+            }
         ))
 
         // rxjava api
@@ -194,22 +225,6 @@ class JavaFeignGenerator : ExtendableJavaCodegenBase(), CodegenConfig, PrimeCode
         ))
 
         // auth files
-        cfg.templateSpecs.add(PrimeTemplateSpec(
-            description = "auth method interface",
-            sourceTemplate = "auth/authMethod.peb",
-            targetDirectory = authFolder,
-            targetFileName = "AuthMethod.java",
-            scope = TemplateScope.API,
-            iterator = TemplateIterator.EACH_API,
-        ))
-        cfg.templateSpecs.add(PrimeTemplateSpec(
-            description = "feign authentication interceptor",
-            sourceTemplate = "auth/authInterceptor.peb",
-            targetDirectory = authFolder,
-            targetFileName = "AuthInterceptor.java",
-            scope = TemplateScope.API,
-            iterator = TemplateIterator.EACH_API,
-        ))
         cfg.templateSpecs.add(PrimeTemplateSpec(
             description = "auth method - apiKey",
             sourceTemplate = "auth/apiKeyAuthSpec.peb",

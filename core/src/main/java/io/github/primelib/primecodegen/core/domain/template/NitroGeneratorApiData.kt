@@ -28,13 +28,4 @@ data class NitroGeneratorApiData(
             return data.map { of(it, config) }
         }
     }
-
-    @JsonIgnore
-    fun asMap(): Map<String, Any> = mapOf(
-        "packageName" to packageName,
-        "classname" to classname,
-        "imports" to imports,
-        "operations" to operations,
-        "primeOperations" to primeOperations,
-    )
 }
