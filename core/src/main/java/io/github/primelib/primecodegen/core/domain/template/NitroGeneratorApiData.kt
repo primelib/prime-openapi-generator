@@ -1,6 +1,5 @@
 package io.github.primelib.primecodegen.core.domain.template;
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import org.openapitools.codegen.CodegenConfig
 import org.openapitools.codegen.CodegenOperation
 
