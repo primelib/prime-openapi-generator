@@ -6,6 +6,8 @@ package {{ t.model.packageName }};
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 {% if t.model.codegenModel.isEnum %}
 {% include "./modelEnum.peb" with {"model": t.model} %}

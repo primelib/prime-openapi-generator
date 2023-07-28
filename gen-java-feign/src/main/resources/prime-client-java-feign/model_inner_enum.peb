@@ -10,5 +10,23 @@
         {{ enumvar.name }}({{ enumvar.value }}){% if not loop.last %},{% else %};{% endif %}{{ newline() }}
 {% endfor %}
 
+        private static final {{ var.enumName }}[] VALUES = values(); // prevent allocating a new array for every call to values()
         private final {{ var.vendorExtensions.get("x-enum-innerType") }} value;
+
+        @JsonCreator
+        public static {{ var.enumName }} of({{ var.vendorExtensions.get("x-enum-innerType") }} input) {
+            if (input != null) {
+                for ({{ var.enumName }} v : VALUES) {
+                    {% if var.vendorExtensions.get("x-enum-innerType") == "String" %}if (input.equalsIgnoreCase(v.value)) {% else %}if (input == v.value) {% endif %}{{ newline() }}
+                        return v;
+                }
+            }
+
+            return null;
+        }
+
+        @JsonValue
+        public {{ var.vendorExtensions.get("x-enum-innerType") }} getValue() {
+            return value;
+        }
     }
