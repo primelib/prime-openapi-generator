@@ -63,9 +63,9 @@ abstract class ExtendableJavaCodegenBase : AbstractJavaCodegen(), CodegenConfig,
         model.imports.remove("ApiModelProperty")
         model.imports.remove("ApiModel")
 
-        // support to overwrite the name via x-alias
-        model.vars.filter { p -> p.vendorExtensions.containsKey("x-alias") }.forEach { p ->
-            p.name = p.vendorExtensions["x-alias"].toString()
+        // support to overwrite the name via x-name-overwrite
+        model.vars.filter { p -> p.vendorExtensions.containsKey("x-name-overwrite") }.forEach { p ->
+            p.name = p.vendorExtensions["x-name-overwrite"].toString()
         }
 
         // container inner type for enums
@@ -117,6 +117,21 @@ abstract class ExtendableJavaCodegenBase : AbstractJavaCodegen(), CodegenConfig,
             content = JavaImportPostProcessor.removeUnusedImports(content)
             file.writeText(content)
         }
+    }
+
+    /**
+     * toVarName calls Camelize which removes _ from the beginning of the input string which is not desired for our use case.
+     * <p>
+     * This override adds the _ back to the beginning of the output string if the input string starts with _.
+     */
+    override fun toVarName(input: String): String {
+        val output = super.toVarName(input)
+
+        if (input.startsWith("_")) {
+            return "_$output"
+        }
+
+        return output
     }
 
     /**

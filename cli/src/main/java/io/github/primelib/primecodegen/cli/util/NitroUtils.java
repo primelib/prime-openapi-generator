@@ -81,8 +81,7 @@ public class NitroUtils {
         try {
             Method method = DefaultGenerator.class.getDeclaredMethod("processOperations", CodegenConfig.class, String.class, List.class, List.class);
             method.setAccessible(true);
-            var response = (Map<String, Object>) method.invoke(generator, config, tag, ops, models);
-            return response;
+            return (Map<String, Object>) method.invoke(generator, config, tag, ops, models);
         } catch (Exception ex) {
             log.error("failed to process model data", ex);
         }

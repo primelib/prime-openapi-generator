@@ -1,6 +1,7 @@
 package io.github.primelib.primecodegen.core.extensions
 
 import io.swagger.v3.oas.models.OpenAPI
+import io.swagger.v3.oas.models.Paths
 import io.swagger.v3.oas.models.SpecVersion
 import io.swagger.v3.oas.models.media.Schema
 import io.swagger.v3.oas.models.parameters.Parameter
@@ -71,24 +72,36 @@ fun OpenAPI.appendAcceptHeaderIfMissing() {
 /**
  * Fix the type of parameters that are arrays but are not marked as such.
  */
-fun OpenAPI.fixParamArrayType() {
+fun OpenAPI.fixParamTypes(paramNameTransformer: (String) -> String) {
     paths?.let { paths ->
-        paths.forEach { (_, pathItem) ->
+        val updatedPaths = Paths()
+
+        paths.forEach { (pathUrl, pathItem) ->
+            var newUrl = pathUrl
+
             pathItem.readOperations().forEach { operation ->
                 operation.parameters?.forEach { param ->
-                    processParam(param)
+                    if (param.`in` == "path") {
+                        newUrl = newUrl.replace("{" + param.name + "}", "{" + paramNameTransformer.invoke(param.name) + "}")
+                    }
+
+                    processParam(param, paramNameTransformer)
                 }
             }
+
+            updatedPaths.addPathItem(newUrl, pathItem)
         }
+
+        this.paths = updatedPaths
     }
 
     components.parameters?.values?.forEach { param ->
-        processParam(param)
+        processParam(param, paramNameTransformer)
     }
 }
 
-fun processParam(param: Parameter) {
-    param.addExtension("x-base-name", param.name.removeSuffix("[]").replace("-", "_"))
+fun processParam(param: Parameter, paranNameTransformer: (String) -> String) {
+    param.addExtension("x-base-name", paranNameTransformer.invoke(param.name.removeSuffix("[]")))
 
     if (param.name.endsWith("[]") && param.explode == true && param.`in` == "query" && !"array".contentEquals(param.schema.type)) {
         // move schema into items

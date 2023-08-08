@@ -8,7 +8,7 @@ import io.github.primelib.primecodegen.core.domain.config.TemplateScope
 import io.github.primelib.primecodegen.core.domain.template.NitroGeneratorImport
 import io.github.primelib.primecodegen.core.extensions.appendAcceptHeaderIfMissing
 import io.github.primelib.primecodegen.core.extensions.appendContentTypeHeaderIfMissing
-import io.github.primelib.primecodegen.core.extensions.fixParamArrayType
+import io.github.primelib.primecodegen.core.extensions.fixParamTypes
 import io.github.primelib.primecodegen.core.extensions.pruneOperationTags
 import io.github.primelib.primecodegen.core.generator.ExtendableJavaCodegenBase
 import io.github.primelib.primecodegen.javafeign.config.JavaFeignGeneratorConfig
@@ -50,7 +50,7 @@ class JavaFeignGenerator : ExtendableJavaCodegenBase(), CodegenConfig, PrimeCode
         openAPI.pruneOperationTags()
         openAPI.appendContentTypeHeaderIfMissing()
         openAPI.appendAcceptHeaderIfMissing()
-        openAPI.fixParamArrayType()
+        openAPI.fixParamTypes { paramName -> toParamName(paramName) }
     }
 
     override fun processOpts() {

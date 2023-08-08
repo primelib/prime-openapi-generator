@@ -65,7 +65,7 @@ public class {{ model.classname }}{% if model.codegenModel.parent is not empty %
      * <p>
      * NOTE: This constructor is not considered stable and may change if the model is updated. Consider using {@link #{{ model.classname }}(Consumer)} instead.
 {% for var in model.codegenModel.vars %}
-     * @param {{ var.name }} {% if var.description is not empty %}{{ javadocDescriptionInline(var.description) }}{% else %}var.name{% endif %}{{ newline() }}
+     * @param {{ var.name }} {% if var.description is not empty %}{{ javadocDescriptionInline(var.description) }}{% else %}{{ var.name }}{% endif %}{{ newline() }}
 {% endfor %}
      */
     @ApiStatus.Internal
