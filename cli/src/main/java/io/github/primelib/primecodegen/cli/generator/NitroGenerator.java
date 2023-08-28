@@ -523,7 +523,7 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
                     }
 
                     Schema schema = schemas.get(name);
-                    if (ModelUtils.isFreeFormObject(this.openAPI, schema)) {
+                    if (ModelUtils.isFreeFormObject(schema)) {
                         Schema refSchema = new Schema();
                         refSchema.set$ref("#/components/schemas/" + name);
                         Schema unaliasedSchema = this.config.unaliasSchema(refSchema);
@@ -557,7 +557,7 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
         // run update / post process on the final data
         Map<String, ModelsMap> processedModels = this.config.updateAllModels(allProcessedModels);
         processedModels = this.config.postProcessAllModels(processedModels);
-        Map<String, Map<String, Object>> modelData = processedModels.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> (Map<String, Object>) e.getValue()));
+        Map<String, Map<String, Object>> modelData = processedModels.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         ctx.setModels(modelData);
     }
 
