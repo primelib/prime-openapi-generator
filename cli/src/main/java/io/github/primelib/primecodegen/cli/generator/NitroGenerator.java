@@ -25,6 +25,8 @@ import org.openapitools.codegen.CodegenConfig;
 import org.openapitools.codegen.CodegenOperation;
 import org.openapitools.codegen.DefaultGenerator;
 import org.openapitools.codegen.Generator;
+import org.openapitools.codegen.InlineModelResolver;
+import org.openapitools.codegen.OpenAPINormalizer;
 import org.openapitools.codegen.config.GlobalSettings;
 import org.openapitools.codegen.meta.GeneratorMetadata;
 import org.openapitools.codegen.meta.Stability;
@@ -169,11 +171,31 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
         }
 
         // preprocess
-        this.config.processOpts();
-        this.config.preprocessOpenAPI(this.openAPI);
-        this.config.setOpenAPI(this.openAPI);
-        if (this.openAPI.getExtensions() != null) {
-            this.config.vendorExtensions().putAll(this.openAPI.getExtensions());
+        config.processOpts();
+
+        // openapi normalizer
+        try {
+            if (config.getUseOpenAPINormalizer()) {
+                OpenAPINormalizer openapiNormalizer = new OpenAPINormalizer(openAPI, config.openapiNormalizer());
+                NitroUtils.useOpenAPINormalizer(openapiNormalizer);
+            }
+        } catch (Exception e) {
+            LOGGER.error("An exception occurred in OpenAPI Normalizer. Please report the issue via https://github.com/openapitools/openapi-generator/issues/new/: ");
+            e.printStackTrace();
+        }
+
+        // inline model resolver
+        if (this.config.getUseInlineModelResolver()) {
+            InlineModelResolver inlineModelResolver = new InlineModelResolver();
+            inlineModelResolver.setInlineSchemaNameMapping(config.inlineSchemaNameMapping());
+            inlineModelResolver.setInlineSchemaOptions(config.inlineSchemaOption());
+            NitroUtils.flattenOpenAPISpec(openAPI);
+        }
+
+        config.preprocessOpenAPI(openAPI);
+        config.setOpenAPI(openAPI);
+        if (openAPI.getExtensions() != null) {
+            config.vendorExtensions().putAll(openAPI.getExtensions());
         }
 
         // process
@@ -316,10 +338,6 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
             } catch (Exception ex) {
                 log.warn("failed to generate file {} [Template: {}]", file.getTargetFileName(), file.getSourceTemplate(), ex);
             }
-
-            // nitroGeneratorData.setModels(NitroGeneratorModelData.ofList(ctx.getModels().values(), this.config));
-            // nitroGeneratorData.setOperations(NitroGeneratorOperationData.ofList(ctx.getOperations().values(), this.config));
-            // nitroGeneratorData.setApi(NitroGeneratorApiData.of(ctx.getApiOperations(), this.config));
         } else if (TemplateIterator.EACH_API.equals(file.getIterator())) {
             ctx.getApiKeys().stream().parallel().forEach(name -> {
                 try {

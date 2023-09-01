@@ -11,6 +11,7 @@ import org.openapitools.codegen.CodegenConfig;
 import org.openapitools.codegen.CodegenOperation;
 import org.openapitools.codegen.DefaultGenerator;
 import org.openapitools.codegen.InlineModelResolver;
+import org.openapitools.codegen.OpenAPINormalizer;
 import org.openapitools.codegen.model.ModelsMap;
 
 import java.io.File;
@@ -99,4 +100,13 @@ public class NitroUtils {
         }
     }
 
+    public void useOpenAPINormalizer(OpenAPINormalizer normalizer) {
+        try {
+            Method method = OpenAPINormalizer.class.getDeclaredMethod("normalize");
+            method.setAccessible(true);
+            method.invoke(normalizer);
+        } catch (Exception ex) {
+            log.error("failed to process model data", ex);
+        }
+    }
 }

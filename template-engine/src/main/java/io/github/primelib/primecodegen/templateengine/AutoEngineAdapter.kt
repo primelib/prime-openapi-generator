@@ -20,6 +20,10 @@ class AutoEngineAdapter : TemplatingEngineAdapter {
             .flatMap { it.fileExtensions.toList() }
             .toSet()
             .toList()
+
+        fun getSupportedExtensions(): List<String> {
+            return extensions
+        }
     }
 
     override fun getIdentifier(): String {
@@ -28,6 +32,15 @@ class AutoEngineAdapter : TemplatingEngineAdapter {
 
     override fun getFileExtensions(): Array<String> {
         return extensions.toTypedArray()
+    }
+
+    override fun handlesFile(filename: String?): Boolean {
+        if (filename == null) {
+            return false
+        }
+
+        val extension = FilenameUtils.getExtension(filename)
+        return engineAdapters.any { a -> a.fileExtensions.any { e -> e.equals(extension, ignoreCase = true) } }
     }
 
     override fun compileTemplate(

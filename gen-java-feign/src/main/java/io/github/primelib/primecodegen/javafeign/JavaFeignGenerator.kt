@@ -273,6 +273,12 @@ class JavaFeignGenerator : ExtendableJavaCodegenBase(), CodegenConfig, PrimeCode
             scope = TemplateScope.SUPPORT,
         ))
         cfg.templateSpecs.add(PrimeTemplateSpec(
+            sourceTemplate = "gradle/gradle-wrapper.jar",
+            targetDirectory = outputFolder,
+            targetFileName = "gradle/wrapper/gradle-wrapper.jar",
+            scope = TemplateScope.SUPPORT,
+        ))
+        cfg.templateSpecs.add(PrimeTemplateSpec(
             sourceTemplate = "gradle/gradlew.peb",
             targetDirectory = outputFolder,
             targetFileName = "gradlew",
@@ -301,8 +307,6 @@ class JavaFeignGenerator : ExtendableJavaCodegenBase(), CodegenConfig, PrimeCode
     override fun postProcess() {
         println("################################################################################");
         println("# Thanks for using the PrimeLib OpenAPI Generator.                             #");
-        println("#                                                                              #");
-        println("# Generator: java8 feign                                                       #");
         println("################################################################################");
     }
 
