@@ -41,6 +41,9 @@ local.properties
 !gradle/wrapper/*.jar
 !gradle.properties
 
+# gradle wrapper in template
+!**/src/main/resources/**/gradle/gradle-wrapper.jar
+
 # Logs / Save Files
 config/*
 client.log

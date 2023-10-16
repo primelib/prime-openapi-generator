@@ -46,12 +46,12 @@ allprojects {
 
     dependencies {
         constraints {
-            add("api", "org.openapitools:openapi-generator:7.0.0")
-            add("api", "org.openapitools:openapi-generator-cli:7.0.0")
+            add("api", "org.openapitools:openapi-generator:7.0.1")
+            add("api", "org.openapitools:openapi-generator-cli:7.0.1")
         }
 
         // annotations
-        implementation("org.jetbrains:annotations:16.0.2")
+        implementation("org.jetbrains:annotations:24.0.1")
 
         // testing
         testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0")
