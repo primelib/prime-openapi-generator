@@ -6,6 +6,26 @@
 	"baseBranches": [
 		"main"
 	],
-	"assignees": [],
-	"reviewers": ["PhilippHeuer"]
+	"assignees": [
+
+	],
+	"reviewers": [
+		"PhilippHeuer"
+	],
+	"gradle-wrapper": {
+		"fileMatch": [
+			"gradle-wrapper\\.properties\\.peb$"
+		]
+	},
+	"regexManagers": [
+		{
+			"datasourceTemplate": "maven",
+			"fileMatch": [
+				".*\\.gradle.kts.peb$"
+			],
+			"matchStrings": [
+				"[a-zA-Z]+\\(\"(?<depName>.*):(?<currentValue>[0-9.]+)\"\\)"
+			]
+		}
+	]
 }
