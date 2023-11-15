@@ -51,7 +51,7 @@ allprojects {
         }
 
         // annotations
-        implementation("org.jetbrains:annotations:24.0.1")
+        implementation("org.jetbrains:annotations:24.1.0")
 
         // testing
         testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.1")
