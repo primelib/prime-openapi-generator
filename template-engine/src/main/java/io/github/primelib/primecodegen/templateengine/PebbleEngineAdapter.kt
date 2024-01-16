@@ -51,6 +51,6 @@ class PebbleEngineAdapter : TemplatingEngineAdapter {
         val writer = StringWriter()
         val compiledTemplate: PebbleTemplate = engine.getTemplate(templateFile)
         compiledTemplate.evaluate(writer, bundle)
-        return writer.toString()
+        return writer.toString().replace("\r\n", "\n")
     }
 }
