@@ -100,8 +100,8 @@ fun OpenAPI.fixParamTypes(paramNameTransformer: (String) -> String) {
     }
 }
 
-fun processParam(param: Parameter, paranNameTransformer: (String) -> String) {
-    param.addExtension("x-base-name", paranNameTransformer.invoke(param.name.removeSuffix("[]")))
+fun processParam(param: Parameter, paramNameTransformer: (String) -> String) {
+    param.addExtension("x-base-name", paramNameTransformer.invoke(param.name.removeSuffix("[]")))
 
     if (param.name.endsWith("[]") && param.explode == true && param.`in` == "query" && !"array".contentEquals(param.schema.type)) {
         // move schema into items

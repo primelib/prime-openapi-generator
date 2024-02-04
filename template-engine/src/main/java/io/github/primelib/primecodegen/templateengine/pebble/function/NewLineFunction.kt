@@ -15,6 +15,6 @@ class NewLineFunction : Function {
         context: EvaluationContext,
         lineNumber: Int
     ): Any {
-        return "\r\n"
+        return "\n"
     }
 }
