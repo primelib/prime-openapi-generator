@@ -18,7 +18,7 @@ import org.openapitools.codegen.CodegenType
 
 class JavaFeignGenerator : ExtendableJavaCodegenBase(), CodegenConfig, PrimeCodegenBase {
     companion object {
-        const val CODEGEN_NAME = "prime-client-java-feign"
+        const val CODEGEN_NAME = "primecodegen-java-feign"
         const val CODEGEN_HELP = "Generates a $CODEGEN_NAME client library."
     }
 
@@ -294,12 +294,6 @@ class JavaFeignGenerator : ExtendableJavaCodegenBase(), CodegenConfig, PrimeCode
             sourceTemplate = "support/gitignore.peb",
             targetDirectory = outputFolder,
             targetFileName = ".gitignore",
-            scope = TemplateScope.SUPPORT,
-        ))
-        cfg.templateSpecs.add(PrimeTemplateSpec(
-            sourceTemplate = "support/renovate.json.peb",
-            targetDirectory = outputFolder,
-            targetFileName = "renovate.json",
             scope = TemplateScope.SUPPORT,
         ))
     }
