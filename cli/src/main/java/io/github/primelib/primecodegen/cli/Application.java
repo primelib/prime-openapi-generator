@@ -4,12 +4,13 @@ import io.airlift.airline.Cli;
 import io.airlift.airline.ParseArgumentsUnexpectedException;
 import io.airlift.airline.ParseOptionMissingException;
 import io.airlift.airline.ParseOptionMissingValueException;
-import io.github.primelib.primecodegen.cli.cmd.NitroGenerateCmd;
+import io.github.primelib.primecodegen.cli.cmd.PrimeGenerateCmd;
 import org.openapitools.codegen.OpenAPIGenerator;
 import org.openapitools.codegen.cmd.AuthorTemplate;
 import org.openapitools.codegen.cmd.BuildInfo;
 import org.openapitools.codegen.cmd.CompletionCommand;
 import org.openapitools.codegen.cmd.ConfigHelp;
+import org.openapitools.codegen.cmd.Generate;
 import org.openapitools.codegen.cmd.GenerateBatch;
 import org.openapitools.codegen.cmd.HelpCommand;
 import org.openapitools.codegen.cmd.ListGenerators;
@@ -37,7 +38,8 @@ public class Application extends OpenAPIGenerator {
                         .withDefaultCommand(HelpCommand.class)
                         .withCommands(
                                 ListGenerators.class,
-                                NitroGenerateCmd.class,
+                                Generate.class,
+                                PrimeGenerateCmd.class,
                                 Meta.class,
                                 HelpCommand.class,
                                 ConfigHelp.class,

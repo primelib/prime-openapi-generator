@@ -8,9 +8,9 @@ import org.openapitools.codegen.cmd.Generate;
 
 import java.lang.reflect.Field;
 
-@Command(name = "generate", description = "Generate code with the specified generator.")
+@Command(name = "prime-generate", description = "Generate code with the specified generator.")
 @Slf4j
-public class NitroGenerateCmd extends Generate {
+public class PrimeGenerateCmd extends Generate {
 
     @Override
     public void execute() {
