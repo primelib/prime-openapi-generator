@@ -298,11 +298,7 @@ class JavaFeignGenerator : ExtendableJavaCodegenBase(), CodegenConfig, PrimeCode
         ))
     }
 
-    override fun postProcess() {
-        println("################################################################################");
-        println("# Thanks for using the PrimeLib OpenAPI Generator.                             #");
-        println("################################################################################");
-    }
+    override fun postProcess() {}
 
     override fun cfg(): PrimeCodegenConfig {
         return cfg

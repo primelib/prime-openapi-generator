@@ -8,6 +8,7 @@ import io.swagger.v3.oas.models.media.Schema
 import org.openapitools.codegen.CodegenConfig
 import org.openapitools.codegen.CodegenModel
 import org.openapitools.codegen.CodegenProperty
+import org.openapitools.codegen.languages.AbstractGoCodegen
 import org.openapitools.codegen.languages.AbstractJavaCodegen
 import org.openapitools.codegen.model.ModelMap
 import org.openapitools.codegen.model.OperationsMap
@@ -19,7 +20,7 @@ import java.io.IOException
  * <p>
  * This is an extendable version of the AbstractJavaCodegen, which has all generated templates and legacy imports removed.
  */
-abstract class ExtendableJavaCodegenBase : AbstractJavaCodegen(), CodegenConfig, PrimeCodegenBase {
+abstract class ExtendableGoCodegenBase : AbstractGoCodegen(), CodegenConfig, PrimeCodegenBase {
     private val containerInnerTypePattern = Regex("""^.*<(.+)>$""")
 
     init {
@@ -29,15 +30,6 @@ abstract class ExtendableJavaCodegenBase : AbstractJavaCodegen(), CodegenConfig,
         modelDocTemplateFiles.clear()
         apiDocTemplateFiles.clear()
         supportingFiles.clear()
-        importMapping.remove("ApiModelProperty", "io.swagger.annotations.ApiModelProperty")
-        importMapping.remove("ApiModel", "io.swagger.annotations.ApiModel")
-        importMapping.remove("DateTime")
-        importMapping.remove("LocalDateTime")
-        importMapping.remove("LocalDate")
-        importMapping.remove("LocalTime")
-        dateLibrary = "java8"
-        typeMapping["date"] = "Instant"
-        importMapping["Instant"] = "java.time.Instant"
 
         // clear reserved words not used by our generator
         reservedWords.removeAll(setOf(
@@ -54,9 +46,6 @@ abstract class ExtendableJavaCodegenBase : AbstractJavaCodegen(), CodegenConfig,
 
     override fun processOpts() {
         super.processOpts()
-
-        // mainClassName
-        // additionalProperties.put("mainClassName", camelize(Objects.toString(additionalProperties.get("mainClassName").toString(), "default"), CamelizeOption.UPPERCASE_FIRST_CHAR))
     }
 
     override fun preprocessOpenAPI(openAPI: OpenAPI) {
@@ -65,10 +54,6 @@ abstract class ExtendableJavaCodegenBase : AbstractJavaCodegen(), CodegenConfig,
 
     override fun postProcessModelProperty(model: CodegenModel, property: CodegenProperty) {
         super.postProcessModelProperty(model, property)
-
-        // clear legacy imports from base codegen
-        model.imports.remove("ApiModelProperty")
-        model.imports.remove("ApiModel")
 
         // support to overwrite the name via x-name-overwrite
         model.vars.filter { p -> p.vendorExtensions.containsKey("x-name-overwrite") }.forEach { p ->
@@ -91,10 +76,6 @@ abstract class ExtendableJavaCodegenBase : AbstractJavaCodegen(), CodegenConfig,
     override fun fromModel(name: String, model: Schema<*>): CodegenModel {
         val codegenModel = super.fromModel(name, model)
 
-        // clear legacy imports from base codegen
-        codegenModel.imports.remove("ApiModel")
-        codegenModel.imports.remove("org.threeten.bp.LocalDate")
-
         return codegenModel
     }
 
@@ -102,28 +83,7 @@ abstract class ExtendableJavaCodegenBase : AbstractJavaCodegen(), CodegenConfig,
         val modifiedObjs = super.postProcessOperationsWithModels(objs, allModels)
         modifiedObjs.preprocessOperations()
 
-        // set void as return type, if returnType is null
-        modifiedObjs.operations.operation.forEach { operation ->
-            if (operation.returnType == null) {
-                operation.returnType = "void"
-            }
-        }
-
         return modifiedObjs
-    }
-
-    override fun postProcessFile(file: File?, fileType: String?) {
-        super.postProcessFile(file, fileType)
-        if (file == null) {
-            return
-        }
-
-        // process all files with dart extension
-        if ("java" == file.extension) {
-            var content = file.readText()
-            content = JavaImportPostProcessor.removeUnusedImports(content)
-            file.writeText(content)
-        }
     }
 
     /**

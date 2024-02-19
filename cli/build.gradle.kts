@@ -15,7 +15,7 @@ dependencies {
 
     implementation(project(":core"))
     implementation(project(":template-engine"))
-    implementation(project(":gen-java-feign"))
+    implementation(project(":generators"))
 
     // logging
     implementation("org.slf4j:slf4j-simple:2.0.12")
