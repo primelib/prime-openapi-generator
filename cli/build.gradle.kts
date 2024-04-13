@@ -18,7 +18,7 @@ dependencies {
     implementation(project(":generators"))
 
     // logging
-    implementation("org.slf4j:slf4j-simple:2.0.12")
+    implementation("org.slf4j:slf4j-simple:2.0.13")
 }
 
 application {
