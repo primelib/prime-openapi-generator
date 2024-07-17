@@ -47,6 +47,20 @@ public class NitroUtils {
     }
 
     /**
+     * Flatten OpenAPI Spec
+     */
+    public void flattenOpenAPISpec(@NotNull OpenAPI openAPI, @NotNull InlineModelResolver inlineModelResolver) {
+        try {
+            Method method = InlineModelResolver.class.getDeclaredMethod("flatten", OpenAPI.class);
+            method.setAccessible(true);
+            method.invoke(inlineModelResolver, openAPI);
+        } catch (Exception ex) {
+            log.error("Failed to flatten openapi spec!", ex);
+            System.exit(1);
+        }
+    }
+
+    /**
      * Generate Files Metadata
      */
     public void generateFilesMetadata(DefaultGenerator generator, @NotNull List<File> files) {
