@@ -164,7 +164,7 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
             inlineModelResolver.setInlineSchemaNameMapping(config.inlineSchemaNameMapping());
             inlineModelResolver.setInlineSchemaOptions(config.inlineSchemaOption());
             NitroUtils.flattenOpenAPISpec(openAPI, inlineModelResolver);
-        }1
+        }
 
         config.preprocessOpenAPI(openAPI);
         config.setOpenAPI(openAPI);
