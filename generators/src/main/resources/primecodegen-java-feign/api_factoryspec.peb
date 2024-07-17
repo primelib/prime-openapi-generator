@@ -130,5 +130,6 @@ public final class {{ t.mainClassName }}FactorySpec<T> extends FeignModuleSpec<{
         auth(spec.auth());
         proxy = spec.proxy();
         meterRegistry(spec.meterRegistry());
+        logLevel(spec.logLevel());
     }
 }
