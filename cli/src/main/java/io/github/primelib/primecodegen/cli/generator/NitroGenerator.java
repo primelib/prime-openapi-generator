@@ -175,7 +175,7 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
 
         // openapi normalizer
         try {
-            if (config.getUseOpenAPINormalizer()) {
+            if (config.getUseOpenapiNormalizer()) {
                 OpenAPINormalizer openapiNormalizer = new OpenAPINormalizer(openAPI, config.openapiNormalizer());
                 NitroUtils.useOpenAPINormalizer(openapiNormalizer);
             }
