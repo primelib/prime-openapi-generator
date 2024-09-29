@@ -42,7 +42,9 @@ data class OpenAPIDetails(
             openAPI.paths?.let { paths ->
                 paths.forEach { (path, pathItem) ->
                     pathItem.readOperations().forEach { operation ->
-                        val hasFormParam = operation.parameters?.any { it.`in` == "formData" } ?: false
+                        val hasFormParam = operation.parameters?.any { it.`in` == "formData" } == true ||
+                            operation.requestBody?.content?.containsKey("multipart/form-data") == true ||
+                            operation.requestBody?.content?.containsKey("application/x-www-form-urlencoded") == true
                         if (hasFormParam) {
                             details.hasFormParameters = true
                         }

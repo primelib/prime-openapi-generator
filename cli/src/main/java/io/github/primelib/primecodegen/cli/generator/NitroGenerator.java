@@ -166,7 +166,7 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
         nitroGeneratorData.setConfig(codegen.cfg());
 
         // error prevention
-        if (config.apiTemplateFiles().size() > 0) {
+        if (!config.apiTemplateFiles().isEmpty()) {
             log.error("apiTemplateFiles only work when using the default generator");
         }
 
@@ -175,7 +175,7 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
 
         // openapi normalizer
         try {
-            if (config.getUseOpenAPINormalizer()) {
+            if (config.getUseOpenapiNormalizer()) {
                 OpenAPINormalizer openapiNormalizer = new OpenAPINormalizer(openAPI, config.openapiNormalizer());
                 NitroUtils.useOpenAPINormalizer(openapiNormalizer);
             }
@@ -185,11 +185,11 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
         }
 
         // inline model resolver
+        InlineModelResolver inlineModelResolver = new InlineModelResolver();
         if (this.config.getUseInlineModelResolver()) {
-            InlineModelResolver inlineModelResolver = new InlineModelResolver();
             inlineModelResolver.setInlineSchemaNameMapping(config.inlineSchemaNameMapping());
             inlineModelResolver.setInlineSchemaOptions(config.inlineSchemaOption());
-            NitroUtils.flattenOpenAPISpec(openAPI);
+            NitroUtils.flattenOpenAPISpec(openAPI, inlineModelResolver);
         }
 
         config.preprocessOpenAPI(openAPI);
@@ -199,7 +199,7 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
         }
 
         // process
-        NitroUtils.flattenOpenAPISpec(openAPI);
+        NitroUtils.flattenOpenAPISpec(openAPI, inlineModelResolver);
         configureGeneratorProperties();
         configureOpenAPIInfo();
         config.processOpenAPI(this.openAPI);
@@ -384,11 +384,11 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
     /**
      * processes a file and writes it to disk
      *
-     * @param ctx GeneratorContext
-     * @param file NitroCodegenFile
-     * @param name name
+     * @param ctx          GeneratorContext
+     * @param file         NitroCodegenFile
+     * @param name         name
      * @param templateData templateData
-     * @param skippedBy the property that needs to be set to skip generation of this file
+     * @param skippedBy    the property that needs to be set to skip generation of this file
      * @throws IOException
      */
     private void processFile(@NotNull GeneratorContext ctx, @NotNull PrimeTemplateSpec file, @NotNull String name, @NotNull Map<String, Object> templateData, @NotNull String skippedBy) throws IOException {
@@ -524,8 +524,8 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
                     log.debug("Model {} not imported due to import mapping", name);
                     Iterator var22 = this.config.modelTemplateFiles().keySet().iterator();
 
-                    while(var22.hasNext()) {
-                        String templateName = (String)var22.next();
+                    while (var22.hasNext()) {
+                        String templateName = (String) var22.next();
                         String filename = this.config.modelFilename(templateName, name);
                         Path path = Paths.get(filename);
                         this.templateProcessor.skip(path, "Skipped prior to model processing due to import mapping conflict (either by user or by generator).");
@@ -618,12 +618,12 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
                 boolean isGroupParameters;
                 if (this.config.vendorExtensions().containsKey("x-group-parameters")) {
                     isGroupParameters = Boolean.parseBoolean(this.config.vendorExtensions().get("x-group-parameters").toString());
-                    Map<String, Object> objectMap = (Map)operation.get("operations");
-                    List<CodegenOperation> operationss = (List)objectMap.get("operation");
+                    Map<String, Object> objectMap = (Map) operation.get("operations");
+                    List<CodegenOperation> operationss = (List) objectMap.get("operation");
                     Iterator var15 = operationss.iterator();
 
-                    while(var15.hasNext()) {
-                        CodegenOperation op = (CodegenOperation)var15.next();
+                    while (var15.hasNext()) {
+                        CodegenOperation op = (CodegenOperation) var15.next();
                         if (isGroupParameters && !op.vendorExtensions.containsKey("x-group-parameters")) {
                             op.vendorExtensions.put("x-group-parameters", Boolean.TRUE);
                         }
