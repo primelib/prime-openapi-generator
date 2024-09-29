@@ -1,30 +1,32 @@
 package io.github.primelib.primecodegen.cli.generator;
 
-import static org.openapitools.codegen.utils.StringUtils.camelize;
-
 import io.github.primelib.primecodegen.cli.domain.GeneratorContext;
 import io.github.primelib.primecodegen.cli.util.NitroUtils;
 import io.github.primelib.primecodegen.core.api.PrimeCodegenBase;
 import io.github.primelib.primecodegen.core.domain.config.PrimeTemplateSpec;
 import io.github.primelib.primecodegen.core.domain.config.TemplateIterator;
 import io.github.primelib.primecodegen.core.domain.config.TemplateScope;
-import io.github.primelib.primecodegen.core.domain.template.*;
+import io.github.primelib.primecodegen.core.domain.template.AuthTemplateData;
+import io.github.primelib.primecodegen.core.domain.template.NitroGeneratorApiData;
+import io.github.primelib.primecodegen.core.domain.template.NitroGeneratorData;
+import io.github.primelib.primecodegen.core.domain.template.NitroGeneratorModelData;
+import io.github.primelib.primecodegen.core.domain.template.NitroGeneratorOperationData;
+import io.github.primelib.primecodegen.core.domain.template.OpenAPIDetails;
+import io.github.primelib.primecodegen.core.domain.template.ProjectData;
 import io.swagger.v3.core.util.Json;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.media.Schema;
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.ZonedDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
-import org.openapitools.codegen.*;
+import org.openapitools.codegen.ClientOptInput;
+import org.openapitools.codegen.CodegenConfig;
+import org.openapitools.codegen.CodegenOperation;
+import org.openapitools.codegen.DefaultGenerator;
+import org.openapitools.codegen.Generator;
+import org.openapitools.codegen.InlineModelResolver;
+import org.openapitools.codegen.OpenAPINormalizer;
 import org.openapitools.codegen.config.GlobalSettings;
 import org.openapitools.codegen.meta.GeneratorMetadata;
 import org.openapitools.codegen.meta.Stability;
@@ -34,6 +36,30 @@ import org.openapitools.codegen.utils.CamelizeOption;
 import org.openapitools.codegen.utils.ImplementationVersion;
 import org.openapitools.codegen.utils.ModelUtils;
 import org.openapitools.codegen.utils.URLPathUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
+
+import static org.openapitools.codegen.utils.StringUtils.camelize;
 
 /**
  * NitroGenerator
@@ -140,7 +166,7 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
         nitroGeneratorData.setConfig(codegen.cfg());
 
         // error prevention
-        if (config.apiTemplateFiles().size() > 0) {
+        if (!config.apiTemplateFiles().isEmpty()) {
             log.error("apiTemplateFiles only work when using the default generator");
         }
 
@@ -173,7 +199,7 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
         }
 
         // process
-        NitroUtils.flattenOpenAPISpec(openAPI,inlineModelResolver);
+        NitroUtils.flattenOpenAPISpec(openAPI, inlineModelResolver);
         configureGeneratorProperties();
         configureOpenAPIInfo();
         config.processOpenAPI(this.openAPI);
