@@ -80,7 +80,7 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 
     // metrics
-    api("io.micrometer:micrometer-core:1.14.2")
+    api("io.micrometer:micrometer-core:1.14.3")
 
     // test
     testImplementation("org.slf4j:slf4j-simple:2.0.16")
