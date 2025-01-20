@@ -46,8 +46,8 @@ allprojects {
 
     dependencies {
         constraints {
-            add("api", "org.openapitools:openapi-generator:7.10.0")
-            add("api", "org.openapitools:openapi-generator-cli:7.10.0")
+            add("api", "org.openapitools:openapi-generator:7.11.0")
+            add("api", "org.openapitools:openapi-generator-cli:7.11.0")
         }
 
         // annotations
