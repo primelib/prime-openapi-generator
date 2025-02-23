@@ -3,6 +3,7 @@ package io.github.primelib.primecodegen.core.domain.template
 import io.swagger.v3.oas.models.OpenAPI
 import org.apache.commons.lang3.StringUtils
 
+@Suppress("MaxLineLength", "NestedBlockDepth")
 data class OpenAPIDetails(
     var appName: String? = null,
     var appVersion: String? = null,

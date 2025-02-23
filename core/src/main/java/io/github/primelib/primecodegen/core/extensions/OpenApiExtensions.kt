@@ -6,6 +6,7 @@ import io.swagger.v3.oas.models.SpecVersion
 import io.swagger.v3.oas.models.media.Schema
 import io.swagger.v3.oas.models.parameters.Parameter
 
+@Suppress("NestedBlockDepth")
 fun OpenAPI.pruneOperationTags() {
     if (paths != null) {
         for ((_, path) in paths.entries) {
@@ -21,6 +22,7 @@ fun OpenAPI.pruneOperationTags() {
     }
 }
 
+@Suppress("MaxLineLength", "NestedBlockDepth")
 fun OpenAPI.appendContentTypeHeaderIfMissing() {
     paths?.let { paths ->
         paths.forEach { (_, pathItem) ->
@@ -45,6 +47,7 @@ fun OpenAPI.appendContentTypeHeaderIfMissing() {
     }
 }
 
+@Suppress("MaxLineLength", "NestedBlockDepth")
 fun OpenAPI.appendAcceptHeaderIfMissing() {
     paths?.let { paths ->
         paths.forEach { (_, pathItem) ->
@@ -72,6 +75,7 @@ fun OpenAPI.appendAcceptHeaderIfMissing() {
 /**
  * Fix the type of parameters that are arrays but are not marked as such.
  */
+@Suppress("MaxLineLength", "NestedBlockDepth")
 fun OpenAPI.fixParamTypes(paramNameTransformer: (String) -> String) {
     paths?.let { paths ->
         val updatedPaths = Paths()
@@ -100,6 +104,7 @@ fun OpenAPI.fixParamTypes(paramNameTransformer: (String) -> String) {
     }
 }
 
+@Suppress("UNCHECKED_CAST", "MaxLineLength", "ComplexCondition")
 fun processParam(param: Parameter, paramNameTransformer: (String) -> String) {
     param.addExtension("x-base-name", paramNameTransformer.invoke(param.name.removeSuffix("[]")))
 

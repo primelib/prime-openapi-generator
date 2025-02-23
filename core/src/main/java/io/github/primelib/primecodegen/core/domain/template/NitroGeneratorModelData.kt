@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import org.openapitools.codegen.CodegenConfig
 import org.openapitools.codegen.CodegenModel
 
+@Suppress("UNCHECKED_CAST", "MaxLineLength", "UnusedParameter")
 data class NitroGeneratorModelData(
     val packageName: String,
     val classname: String,

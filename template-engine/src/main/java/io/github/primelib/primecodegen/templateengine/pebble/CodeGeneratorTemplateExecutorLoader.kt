@@ -10,6 +10,7 @@ import java.io.StringReader;
 /**
  * A simple loader that will use the openapi-codegen templatingExecutor if available
  */
+@Suppress("ReturnCount")
 class CodeGeneratorTemplateExecutorLoader : ClasspathLoader() {
     var templatingExecutor: TemplatingExecutor? = null
 

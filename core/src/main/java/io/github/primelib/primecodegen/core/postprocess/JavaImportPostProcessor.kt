@@ -1,5 +1,6 @@
 package io.github.primelib.primecodegen.core.postprocess
 
+@Suppress("MaxLineLength", "MagicNumber", "UtilityClassWithPublicConstructor")
 class JavaImportPostProcessor {
 
     companion object {
@@ -31,7 +32,7 @@ class JavaImportPostProcessor {
                 if (className == "*") {
                     continue
                 }
-
+                
                 val isUsed = lines.any { line -> Regex(Regex.escape(className)).containsMatchIn(line) }
                 if (!isUsed) {
                     unusedImports.add(importLine)

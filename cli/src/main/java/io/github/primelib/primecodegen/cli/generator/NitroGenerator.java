@@ -541,7 +541,7 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
                     }
 
                     Schema schema = schemas.get(name);
-                    if (ModelUtils.isFreeFormObject(schema)) {
+                    if (ModelUtils.isFreeFormObject(schema, this.openAPI)) {
                         Schema refSchema = new Schema();
                         refSchema.set$ref("#/components/schemas/" + name);
                         Schema unaliasedSchema = this.config.unaliasSchema(refSchema);
@@ -618,12 +618,10 @@ public class NitroGenerator extends DefaultGenerator implements Generator {
                 boolean isGroupParameters;
                 if (this.config.vendorExtensions().containsKey("x-group-parameters")) {
                     isGroupParameters = Boolean.parseBoolean(this.config.vendorExtensions().get("x-group-parameters").toString());
-                    Map<String, Object> objectMap = (Map) operation.get("operations");
-                    List<CodegenOperation> operationss = (List) objectMap.get("operation");
-                    Iterator var15 = operationss.iterator();
+                    Map<String, Object> objectMap = (Map)operation.get("operations");
+                    List<CodegenOperation> operationss = (List)objectMap.get("operation");
 
-                    while (var15.hasNext()) {
-                        CodegenOperation op = (CodegenOperation) var15.next();
+                    for (CodegenOperation op : operationss) {
                         if (isGroupParameters && !op.vendorExtensions.containsKey("x-group-parameters")) {
                             op.vendorExtensions.put("x-group-parameters", Boolean.TRUE);
                         }

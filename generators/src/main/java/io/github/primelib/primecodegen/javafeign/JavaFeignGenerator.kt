@@ -16,6 +16,7 @@ import io.swagger.v3.oas.models.OpenAPI
 import org.openapitools.codegen.CodegenConfig
 import org.openapitools.codegen.CodegenType
 
+@Suppress("LongMethod", "EmptyFunctionBlock", "MaxLineLength")
 class JavaFeignGenerator : ExtendableJavaCodegenBase(), CodegenConfig, PrimeCodegenBase {
     companion object {
         const val CODEGEN_NAME = "primecodegen-java-feign"
@@ -106,6 +107,16 @@ class JavaFeignGenerator : ExtendableJavaCodegenBase(), CodegenConfig, PrimeCode
             scope = TemplateScope.API,
             iterator = TemplateIterator.EACH_API,
         ))
+        /*
+        cfg.templateSpecs.add(PrimeTemplateSpec(
+            description = "builder spec variant of the primary api interface",
+            sourceTemplate = "api_builder.peb",
+            targetDirectory = apiFolder,
+            targetFileName = "{mainClassName}BuilderApi.java",
+            scope = TemplateScope.API,
+            iterator = TemplateIterator.EACH_API,
+        ))
+        */
 
         // async api
         cfg.templateSpecs.add(PrimeTemplateSpec(

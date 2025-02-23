@@ -19,6 +19,7 @@ import java.io.IOException
  * <p>
  * This is an extendable version of the AbstractJavaCodegen, which has all generated templates and legacy imports removed.
  */
+@Suppress("MaxLineLength")
 abstract class ExtendableJavaCodegenBase : AbstractJavaCodegen(), CodegenConfig, PrimeCodegenBase {
     private val containerInnerTypePattern = Regex("""^.*<(.+)>$""")
 

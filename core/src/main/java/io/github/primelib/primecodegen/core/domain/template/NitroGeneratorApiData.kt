@@ -3,6 +3,7 @@ package io.github.primelib.primecodegen.core.domain.template;
 import org.openapitools.codegen.CodegenConfig
 import org.openapitools.codegen.CodegenOperation
 
+@Suppress("MaxLineLength")
 data class NitroGeneratorApiData(
     val packageName: String,
     val classname: String,
@@ -11,6 +12,7 @@ data class NitroGeneratorApiData(
     val primeOperations: MutableList<NitroGeneratorOperationData> = mutableListOf(),
 ) {
     companion object {
+        @Suppress("UNCHECKED_CAST")
         fun of(api: MutableMap<String, Any>, config: CodegenConfig): NitroGeneratorApiData {
             val apiData = api["operations"] as MutableMap<String, Any>
 

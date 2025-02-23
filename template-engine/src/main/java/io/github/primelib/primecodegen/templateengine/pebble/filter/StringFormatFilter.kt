@@ -5,6 +5,7 @@ import io.pebbletemplates.pebble.template.EvaluationContext;
 import io.pebbletemplates.pebble.template.PebbleTemplate;
 import org.apache.commons.lang3.StringUtils
 
+@Suppress("ReturnCount")
 class StringFormatFilter : Filter {
     override fun getArgumentNames(): List<String> {
         return listOf("template")

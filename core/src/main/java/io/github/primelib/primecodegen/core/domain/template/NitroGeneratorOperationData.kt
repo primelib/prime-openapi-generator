@@ -4,6 +4,7 @@ import org.openapitools.codegen.CodegenConfig
 import org.openapitools.codegen.CodegenOperation
 import org.openapitools.codegen.CodegenParameter
 
+@Suppress("MaxLineLength")
 data class NitroGeneratorOperationData(
     val packageName: String,
     val classname: String,
