@@ -54,7 +54,7 @@ allprojects {
         implementation("org.jetbrains:annotations:26.0.2")
 
         // testing
-        testImplementation("org.junit.jupiter:junit-jupiter-api:5.13.2")
-        testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.13.2")
+        testImplementation("org.junit.jupiter:junit-jupiter-api:5.13.3")
+        testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.13.3")
     }
 }
