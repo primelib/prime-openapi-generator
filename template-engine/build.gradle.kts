@@ -15,5 +15,5 @@ dependencies {
     api("org.openapitools:openapi-generator")
 
     // template engine
-    api("io.pebbletemplates:pebble:4.1.0")
+    api("io.pebbletemplates:pebble:4.1.1")
 }
